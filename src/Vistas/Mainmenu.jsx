@@ -1,6 +1,7 @@
 ﻿import React, { useState } from 'react';
-import { FaUserCircle, FaMoneyBill, FaClipboard, FaBalanceScale, FaUsers, FaFileAlt, FaSignOutAlt } from 'react-icons/fa'; // Importamos el icono de cierre de sesión
-import '/src/CSS/MainMenu.css';...
+import { FaUserCircle, FaMoneyBill, FaClipboard, FaBalanceScale, FaUsers, FaFileAlt, FaSignOutAlt } from 'react-icons/fa'; // Ejemplo de iconos
+import '/src/CSS/MainMenu.css';
+import IngresosEgresos from './IngresosEgresos.jsx'; 
 
 const MainMenu = () => {
     const [selectedMenu, setSelectedMenu] = useState('Cuota');
@@ -22,11 +23,11 @@ const MainMenu = () => {
                 return <div>Contenido de Cuota</div>;
             case 'Acta':
                 return <div>Contenido de Acta</div>;
-            case 'IngresosEgresos':
-                return <div>Contenido de Ingresos/Egresos</div>;
-            case 'Organizacion':
+            case 'Ingresos/Egresos':
+                return <IngresosEgresos />; // Renderiza el componente de Ingresos/Egresos
+            case 'Organización (Composición Comité)':
                 return <div>Contenido de Organización (Composición Comité)</div>;
-            case 'RegistroAuditoria':
+            case 'Registro Auditoría':
                 return <div>Contenido de Registro Auditoría</div>;
             default:
                 return <div>Seleccione una opción del menú</div>;

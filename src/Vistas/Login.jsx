@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEnvelope, FaLock } from 'react-icons/fa'; // iconos
+import { FaEnvelope, FaLock } from 'react-icons/fa';
 import '/src/CSS/Login.css'; 
 
 const Login = () => {
@@ -14,7 +14,7 @@ const Login = () => {
         console.log('Email:', email, 'Password:', password);
 
         // 
-        navigate('/Menu_Principal'); // Cambia '/home' a la ruta que desees
+        navigate('/Menu_Principal'); 
     };
 
     return (
