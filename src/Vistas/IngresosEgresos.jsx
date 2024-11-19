@@ -1,5 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { FaPlus, FaMoneyBillWave, FaTimes, FaCalendarAlt, FaClipboardList, FaCreditCard } from 'react-icons/fa';
+import '/src/CSS/IngresosEgresos.css';
 
 const IngresosEgresos = () => {
     const [transactions, setTransactions] = useState([]);

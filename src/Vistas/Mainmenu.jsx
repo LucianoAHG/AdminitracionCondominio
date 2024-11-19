@@ -1,7 +1,9 @@
 ﻿import React, { useState } from 'react';
 import { FaUserCircle, FaMoneyBill, FaClipboard, FaBalanceScale, FaUsers, FaFileAlt, FaSignOutAlt } from 'react-icons/fa'; // Ejemplo de iconos
 import '/src/CSS/MainMenu.css';
-import IngresosEgresos from './IngresosEgresos.jsx'; 
+import IngresosEgresos from './IngresosEgresos.jsx';
+import Cuotas from '/src/Vistas/Cuotas.jsx';
+import Actas from '/src/Vistas/Actas.jsx';
 
 const MainMenu = () => {
     const [selectedMenu, setSelectedMenu] = useState('Cuota');
@@ -20,11 +22,11 @@ const MainMenu = () => {
     const renderContent = () => {
         switch (selectedMenu) {
             case 'Cuota':
-                return <div>Contenido de Cuota</div>;
+                return <Cuotas/>;
             case 'Acta':
-                return <div>Contenido de Acta</div>;
+                return <Actas/>;
             case 'Ingresos/Egresos':
-                return <IngresosEgresos />; // Renderiza el componente de Ingresos/Egresos
+                return <IngresosEgresos />;
             case 'Organización (Composición Comité)':
                 return <div>Contenido de Organización (Composición Comité)</div>;
             case 'Registro Auditoría':

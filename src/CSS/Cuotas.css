@@ -1,0 +1,107 @@
+.cuotas-container {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.filters-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.search-input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px;
+    font-size: 1rem;
+    transition: border 0.3s;
+}
+
+    .search-input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.cuota-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    width: 220px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+    .cuota-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .cuota-card h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #333;
+    }
+
+.rol {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0.3rem 0;
+}
+
+.estado {
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+}
+
+    .estado.pendiente {
+        color: #e53935;
+    }
+
+    .estado.pagada {
+        color: #28a745;
+    }
+
+.monto {
+    font-size: 1.5rem;
+    color: #007bff;
+    margin: 0.5rem 0;
+}
+
+.pagar-button {
+    background: #ccc;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: not-allowed;
+    transition: background 0.3s;
+}
+
+    .pagar-button.active {
+        background: #007bff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+        .pagar-button.active:hover {
+            background: #0056b3;
+        }
+
+.cuota-details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+}
