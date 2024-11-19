@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { FaUserCircle, FaMoneyBill, FaClipboard, FaBalanceScale, FaUsers, FaFileAlt, FaSignOutAlt } from 'react-icons/fa'; // Importamos el icono de cierre de sesión
-import '/src/CSS/MainMenu.css';
+import '/src/CSS/MainMenu.css';...
 
 const MainMenu = () => {
     const [selectedMenu, setSelectedMenu] = useState('Cuota');
