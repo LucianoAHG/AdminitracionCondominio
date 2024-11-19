@@ -1,0 +1,136 @@
+/* MainMenu.css */
+
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.main-menu-container {
+    display: flex;
+    height: 100vh;
+}
+
+.menu-sidebar {
+    width: 20%;
+    background: linear-gradient(135deg, #1e1e2f, #343a40);
+    color: #ffffff;
+    padding: 1rem;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 8px 0 0 8px;
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.menu-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-sidebar li {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+    .menu-sidebar li:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+    }
+
+    .menu-sidebar li.active {
+        background: rgba(255, 255, 255, 0.2);
+        font-weight: bold;
+        border-left: 4px solid #00bcd4;
+        padding-left: calc(1rem - 4px);
+    }
+
+.menu-item-icon {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.menu-content {
+    margin-left: 20%;
+    padding: 1rem;
+    flex: 1;
+    position: relative;
+}
+
+/* Contenedor de usuario en la parte inferior del menú */
+#user-container {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin-top: auto;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+    #user-container:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+#user-icon {
+    font-size: 2rem;
+    color: #ffffff;
+    margin-right: 0.5rem;
+}
+
+#user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+#user-name,
+#user-role {
+    margin: 0;
+    color: #ffffff;
+}
+
+#logout-icon {
+    font-size: 1.5rem;
+    color: #e53935;
+    margin-left: auto; /* Alinea el icono a la derecha */
+    cursor: pointer;
+    transition: color 0.3s;
+    animation: blink 1.5s infinite; /* Aplicamos la animación de parpadeo */
+}
+
+    #logout-icon:hover {
+        color: #c62828;
+    }
+
+/* Animación de parpadeo */
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+}
