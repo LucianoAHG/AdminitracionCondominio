@@ -4,6 +4,9 @@ import '/src/CSS/MainMenu.css';
 import IngresosEgresos from './IngresosEgresos.jsx';
 import Cuotas from '/src/Vistas/Cuotas.jsx';
 import Actas from '/src/Vistas/Actas.jsx';
+import Organizacion from '/src/Vistas/Organizacion.jsx';
+import RegistroAuditoria from '/src/Vistas/RegistroAuditoria.jsx';
+
 
 const MainMenu = () => {
     const [selectedMenu, setSelectedMenu] = useState('Cuota');
@@ -12,25 +15,30 @@ const MainMenu = () => {
     const userRole = "Rol Usuario";
 
     const menuItems = [
-        { label: 'Cuota', icon: <FaMoneyBill /> },
         { label: 'Acta', icon: <FaClipboard /> },
+        { label: 'Cuota', icon: <FaMoneyBill /> },
         { label: 'Ingresos/Egresos', icon: <FaBalanceScale /> },
         { label: 'Organización (Composición Comité)', icon: <FaUsers /> },
         { label: 'Registro Auditoría', icon: <FaFileAlt /> }
     ];
 
+    // Ordenar el menú alfabéticamente
+    const sortedMenuItems = [...menuItems].sort((a, b) =>
+        a.label.localeCompare(b.label)
+    );
+
     const renderContent = () => {
         switch (selectedMenu) {
             case 'Cuota':
-                return <Cuotas/>;
+                return <Cuotas />;
             case 'Acta':
-                return <Actas/>;
+                return <Actas />;
             case 'Ingresos/Egresos':
                 return <IngresosEgresos />;
             case 'Organización (Composición Comité)':
-                return <div>Contenido de Organización (Composición Comité)</div>;
+                return <Organizacion/>;
             case 'Registro Auditoría':
-                return <div>Contenido de Registro Auditoría</div>;
+                return <RegistroAuditoria />;
             default:
                 return <div>Seleccione una opción del menú</div>;
         }
@@ -40,7 +48,7 @@ const MainMenu = () => {
         <div className="main-menu-container">
             <div className="menu-sidebar">
                 <ul>
-                    {menuItems.map((item, index) => (
+                    {sortedMenuItems.map((item, index) => (
                         <li
                             key={index}
                             className={selectedMenu === item.label ? 'active' : ''}
