@@ -24,5 +24,5 @@ Este proyecto es una aplicación web diseñada para gestionar transacciones de i
 1. Clona el repositorio:
 
    ```bash
-   git clone https://github.com/tu-usuario/nombre-del-proyecto.git
-   cd nombre-del-proyecto
+   git clone https://github.com/LucianoAHG/AdminitracionCondominio.git
+   cd AdminitracionCondominio
