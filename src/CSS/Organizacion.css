@@ -1,0 +1,136 @@
+/* Contenedor Principal */
+.organizacion-container {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+}
+
+/* Grid Layout */
+.organizacion-grid {
+    display: flex;
+    flex-wrap: wrap; /* Permite que las tarjetas pasen a la siguiente fila si el espacio es insuficiente */
+    gap: 1.5rem;
+    justify-content: center; /* Centra las tarjetas horizontalmente */
+}
+
+/* Estilización de las Tarjetas */
+.organizacion-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 1.5rem;
+    flex: 1 1 calc(33.33% - 1rem); /* Tres tarjetas por fila como máximo */
+    max-width: 350px; /* Tamaño máximo para mantenerlas uniformes */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    border-left: 5px solid transparent;
+}
+
+    .organizacion-card:hover {
+        transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Colores específicos por rol */
+    .organizacion-card.presidente {
+        border-left-color: #007bff;
+    }
+
+    .organizacion-card.secretario {
+        border-left-color: #28a745;
+    }
+
+    .organizacion-card.tesorero {
+        border-left-color: #ffc107;
+    }
+
+/* Contenido de las Tarjetas */
+.card-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card-icon {
+    font-size: 3rem;
+    color: #007bff;
+}
+
+.card-info {
+    text-align: left;
+}
+
+.card-name {
+    font-size: 1.4rem;
+    color: #333;
+    margin: 0.5rem 0;
+    font-weight: bold;
+}
+
+.card-role {
+    color: #555;
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+    font-style: italic;
+}
+
+.card-contact, .card-phone {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+}
+
+.contact-icon, .phone-icon {
+    margin-right: 0.5rem;
+}
+
+/* Botones de Acción */
+.card-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-around;
+    gap: 0.5rem;
+}
+
+.edit-button, .delete-button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.edit-button {
+    background-color: #28a745;
+    color: white;
+}
+
+    .edit-button:hover {
+        background-color: #218838;
+    }
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+    .delete-button:hover {
+        background-color: #c82333;
+    }

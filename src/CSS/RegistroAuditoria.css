@@ -1,0 +1,101 @@
+/* Contenedor Principal */
+.registro-auditoria-container {
+    padding: 1rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h2 {
+    color: #ffffff; /* Letras blancas */
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+}
+
+/* Barra de Búsqueda */
+.search-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+    .search-input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+.search-icon {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+/* Contenedor de la Tabla */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Tabla */
+.registro-auditoria-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 1rem;
+}
+
+    .registro-auditoria-table th,
+    .registro-auditoria-table td {
+        border: 1px solid #ddd;
+        text-align: center;
+        padding: 0.75rem;
+    }
+
+    .registro-auditoria-table th {
+        background-color: #007bff; /* Azul fuerte */
+        color: white; /* Texto blanco para contraste */
+        font-weight: bold;
+    }
+
+    .registro-auditoria-table td {
+        color: white; /* Letras blancas */
+        background-color: #333; /* Fondo gris oscuro */
+    }
+
+/* Sin Resultados */
+.no-results {
+    font-size: 1rem;
+    color: #ffffff; /* Texto blanco */
+    text-align: center;
+}
+
+/* Botón Ver Detalles */
+.view-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+    .view-button:hover {
+        background-color: #0056b3;
+    }
