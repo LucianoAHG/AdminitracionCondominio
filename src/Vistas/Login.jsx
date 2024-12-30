@@ -1,45 +1,67 @@
 ﻿import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
-import '/src/CSS/Login.css'; 
+import '../CSS/Login.css';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [correo, setCorreo] = useState('');
     const [password, setPassword] = useState('');
-    const navigate = useNavigate(); // Hook para manejar la navegación
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Aquí puedes manejar la lógica de envío del formulario
-        console.log('Email:', email, 'Password:', password);
+        try {
+            // Realizar la solicitud de inicio de sesión al backend
+            const response = await axios.post('http://go.miorganizacion.cl:3000/api/login', {
+                Correo: correo,
+                Password: password,
+            });
 
-        // 
-        navigate('/Menu_Principal'); 
+            if (response.data.status === 'success') {
+                const user = response.data.data;
+                console.log('Usuario autenticado:', user);
+
+                // Almacenar datos básicos en localStorage
+                localStorage.setItem('userId', user.Id);
+                localStorage.setItem('userName', user.Nombre);
+                localStorage.setItem('userRole', user.RolNombre);
+
+                // Redirigir al menú principal
+                navigate('/Menu_Principal');
+            } else {
+                setError(response.data.message || 'Error desconocido');
+            }
+        } catch (err) {
+            console.error('Error en el inicio de sesión:', err);
+            setError('Error al iniciar sesión. Verifique sus credenciales.');
+        }
     };
 
     return (
-        <div className="login-container">
-            <h2 className="welcome-text">¡Bienvenido!</h2>
-            <form className="login-form" onSubmit={handleSubmit}>
-                <div className="input-group">
-                    <label htmlFor="email">Correo Electrónico</label>
-                    <div className="input-with-icon">
-                        <FaEnvelope className="icon" /> {/* Icono de correo */}
+        <div id="login-container">
+            <h2 id="welcome-text">¡Bienvenido!</h2>
+            <form id="login-form" onSubmit={handleSubmit}>
+                <div id="input-group-email">
+                    <label htmlFor="email" id="input-label-email">Correo Electrónico</label>
+                    <div id="input-with-icon-email">
+                        <FaEnvelope id="icon-email" />
                         <input
                             type="email"
                             id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={correo}
+                            onChange={(e) => setCorreo(e.target.value)}
                             placeholder="Ingresa tu correo"
                             required
                         />
                     </div>
                 </div>
 
-                <div className="input-group">
-                    <label htmlFor="password">Contraseña</label>
-                    <div className="input-with-icon">
-                        <FaLock className="icon" /> {/* Icono de candado */}
+                <div id="input-group-password">
+                    <label htmlFor="password" id="input-label-password">Contraseña</label>
+                    <div id="input-with-icon-password">
+                        <FaLock id="icon-password" />
                         <input
                             type="password"
                             id="password"
@@ -51,11 +73,11 @@ const Login = () => {
                     </div>
                 </div>
 
-                <div className="forgot-password">
-                    <a href="#">¿Olvidaste tu contraseña?</a>
-                </div>
+                {error && <p id="error-message">{error}</p>}
 
-                <button type="submit" className="login-button">Iniciar Sesión</button>
+                <button id="login-button" type="submit">
+                    Iniciar Sesión
+                </button>
             </form>
         </div>
     );

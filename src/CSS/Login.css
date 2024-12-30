@@ -1,7 +1,8 @@
-body {
+#login-container {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', Arial, sans-serif;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
@@ -9,108 +10,115 @@ body {
     color: #ffffff;
 }
 
-.login-container {
+#welcome-text {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+#login-form {
     background: rgba(255, 255, 255, 0.1);
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
     max-width: 400px;
     width: 100%;
-    transition: transform 0.3s ease-in-out;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-    .login-container:hover {
-        transform: scale(1.02);
-    }
-
-.welcome-text {
-    text-align: center;
-    margin-bottom: 1rem;
-    font-size: 1.8rem;
-    color: #e0e0e0;
-}
-
-.login-form {
-    display: flex;
-    flex-direction: column;
-}
-
-.input-group {
+#input-group-email, #input-group-password {
     margin-bottom: 1.5rem;
     position: relative;
 }
 
-.label {
-    font-size: 1rem;
+#input-label-email, #input-label-password {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #d1d1d1;
 }
 
-.input-with-icon {
+#input-with-icon-email, #input-with-icon-password {
     display: flex;
     align-items: center;
     background: rgba(255, 255, 255, 0.2);
-    padding: 0.5rem;
-    border-radius: 4px;
+    padding: 0.75rem;
+    border-radius: 6px;
     transition: background 0.3s ease;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
-    .input-with-icon:hover {
+    #input-with-icon-email:hover, #input-with-icon-password:hover {
         background: rgba(255, 255, 255, 0.3);
     }
 
-    .input-with-icon .icon {
-        margin-right: 0.5rem;
-        color: #d1d1d1;
-        font-size: 1.2rem;
-    }
+#icon-email, #icon-password {
+    margin-right: 0.8rem;
+    color: #d1d1d1;
+    font-size: 1.4rem;
+}
 
-input[type="email"],
-input[type="password"] {
+#email, #password {
     flex: 1;
     padding: 0.5rem;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     outline: none;
     background: transparent;
     color: #ffffff;
     font-size: 1rem;
 }
 
-    input[type="email"]::placeholder,
-    input[type="password"]::placeholder {
+    #email::placeholder, #password::placeholder {
         color: #cccccc;
     }
 
-.forgot-password {
+#forgot-password {
     margin-bottom: 1rem;
-    text-align: left; /* Alineado hacia la izquierda */
-    padding-left: 0.5rem; 
+    text-align: right;
+    font-size: 0.9rem;
 }
 
-    .forgot-password a {
-        color: #00bcd4;
-        text-decoration: none;
-        transition: color 0.3s;
+#forgot-password-link {
+    color: #00bcd4;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+    #forgot-password-link:hover {
+        color: #ffffff;
     }
 
-        .forgot-password a:hover {
-            color: #ffffff;
-        }
+#error-message {
+    color: #ff4d4d;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
 
-.login-button {
-    padding: 0.75rem;
+#login-button {
+    padding: 0.85rem;
     border: none;
-    border-radius: 4px;
-    background: #00bcd4;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
     color: #ffffff;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-    .login-button:hover {
-        background: #0097a7;
+    #login-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 204, 255, 0.5);
     }
 
-    .login-button:active {
+    #login-button:active {
         transform: scale(0.98);
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
     }

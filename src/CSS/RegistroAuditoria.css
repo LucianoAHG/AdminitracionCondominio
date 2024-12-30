@@ -70,8 +70,8 @@ h2 {
     }
 
     .registro-auditoria-table td {
-        color: white; /* Letras blancas */
-        background-color: #333; /* Fondo gris oscuro */
+        color: black; /* Letras blancas */
+        background-color: white; /* Fondo gris oscuro */
     }
 
 /* Sin Resultados */

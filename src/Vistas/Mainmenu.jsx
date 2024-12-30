@@ -1,12 +1,12 @@
 ﻿import React, { useState } from 'react';
-import { FaUserCircle, FaMoneyBill, FaClipboard, FaBalanceScale, FaUsers, FaFileAlt, FaSignOutAlt } from 'react-icons/fa'; // Ejemplo de iconos
-import '/src/CSS/MainMenu.css';
+import { FaUserCircle, FaMoneyBill, FaClipboard, FaBalanceScale, FaUsers, FaFileAlt, FaSignOutAlt, FaUser } from 'react-icons/fa'; // Ejemplo de iconos
+import '../CSS/MainMenu.css';
 import IngresosEgresos from './IngresosEgresos.jsx';
 import Cuotas from '/src/Vistas/Cuotas.jsx';
 import Actas from '/src/Vistas/Actas.jsx';
 import Organizacion from '/src/Vistas/Organizacion.jsx';
 import RegistroAuditoria from '/src/Vistas/RegistroAuditoria.jsx';
-
+import Usuarios from '/src/Vistas/Usuarios.jsx';
 
 const MainMenu = () => {
     const [selectedMenu, setSelectedMenu] = useState('Cuota');
@@ -19,7 +19,8 @@ const MainMenu = () => {
         { label: 'Cuota', icon: <FaMoneyBill /> },
         { label: 'Ingresos/Egresos', icon: <FaBalanceScale /> },
         { label: 'Organización (Composición Comité)', icon: <FaUsers /> },
-        { label: 'Registro Auditoría', icon: <FaFileAlt /> }
+        { label: 'Registro Auditoría', icon: <FaFileAlt /> },
+        { label: 'Usuarios', icon: <FaUser /> } // Añadido Usuarios
     ];
 
     // Ordenar el menú alfabéticamente
@@ -36,9 +37,11 @@ const MainMenu = () => {
             case 'Ingresos/Egresos':
                 return <IngresosEgresos />;
             case 'Organización (Composición Comité)':
-                return <Organizacion/>;
+                return <Organizacion />;
             case 'Registro Auditoría':
                 return <RegistroAuditoria />;
+            case 'Usuarios': // Añadido el renderizado para Usuarios
+                return <Usuarios />;
             default:
                 return <div>Seleccione una opción del menú</div>;
         }

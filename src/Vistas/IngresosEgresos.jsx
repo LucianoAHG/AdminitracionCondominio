@@ -1,133 +1,180 @@
-﻿import React, { useState } from 'react';
-import { FaPlus, FaMoneyBillWave, FaTimes, FaCalendarAlt, FaClipboardList, FaCreditCard } from 'react-icons/fa';
-import '/src/CSS/IngresosEgresos.css';
+﻿import React, { useState, useEffect } from 'react';
+import { Modal, Button } from 'react-bootstrap';
+import axios from 'axios';
+import '../CSS/IngresosEgresos.css';
 
 const IngresosEgresos = () => {
-    const [transactions, setTransactions] = useState([]);
-    const [showForm, setShowForm] = useState(false);
-    const [formData, setFormData] = useState({
-        tipo: 'Ingreso',
-        fecha: '',
-        descripcion: '',
-        categoria: '',
-        monto: '',
-        metodoPago: ''
+    const [registros, setRegistros] = useState([]);
+    const [search, setSearch] = useState('');
+    const [filteredRegistros, setFilteredRegistros] = useState([]);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [newRegistro, setNewRegistro] = useState({
+        Tipo: 'ingreso',
+        Categoria: '',
+        Descripcion: '',
+        Monto: '',
+        Fecha: '',
+        IdUsuario: ''
     });
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+    const baseUrl = 'http://localhost:3000/api/ingresos-egresos';
+
+    const getAuthHeader = () => {
+        const token = localStorage.getItem('token');
+        return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        setTransactions([...transactions, formData]);
-        setShowForm(false);
-        setFormData({
-            tipo: 'Ingreso',
-            fecha: '',
-            descripcion: '',
-            categoria: '',
-            monto: '',
-            metodoPago: ''
-        });
+    useEffect(() => {
+        fetchRegistros();
+    }, []);
+
+    const fetchRegistros = async () => {
+        try {
+            const response = await axios.get(baseUrl, { headers: getAuthHeader() });
+            setRegistros(response.data.data);
+            setFilteredRegistros(response.data.data);
+        } catch (error) {
+            console.error('Error al obtener los registros:', error);
+        }
+    };
+
+    const handleSearch = (e) => {
+        const value = e.target.value.toLowerCase();
+        setSearch(value);
+        setFilteredRegistros(
+            registros.filter(
+                (registro) =>
+                    registro.Categoria.toLowerCase().includes(value) ||
+                    registro.Tipo.toLowerCase().includes(value) ||
+                    (registro.UsuarioNombre && registro.UsuarioNombre.toLowerCase().includes(value))
+            )
+        );
+    };
+
+    const handleCreateRegistro = async () => {
+        try {
+            await axios.post(baseUrl, newRegistro, { headers: getAuthHeader() });
+            alert('Registro creado con éxito');
+            setShowCreateModal(false);
+            setNewRegistro({ Tipo: 'ingreso', Categoria: '', Descripcion: '', Monto: '', Fecha: '', IdUsuario: '' });
+            fetchRegistros();
+        } catch (error) {
+            console.error('Error al crear el registro:', error);
+        }
+    };
+
+    const handleDeleteRegistro = async (id) => {
+        if (window.confirm('¿Estás seguro de que deseas eliminar este registro?')) {
+            try {
+                await axios.delete(`${baseUrl}/${id}`, { headers: getAuthHeader() });
+                alert('Registro eliminado con éxito');
+                fetchRegistros();
+            } catch (error) {
+                console.error('Error al eliminar el registro:', error);
+            }
+        }
     };
 
     return (
         <div className="ingresos-egresos-container">
             <h2>Gestión de Ingresos y Egresos</h2>
-            <div className="buttons-container">
-                <button onClick={() => setShowForm(true)} className="add-button">
-                    <FaPlus className="icon" /> Agregar Ingreso/Egreso
-                </button>
-            </div>
-            {showForm && (
-                <form onSubmit={handleFormSubmit} className="transaction-form">
-                    <label>
-                        Tipo de Transacción:
-                        <select name="tipo" value={formData.tipo} onChange={handleInputChange}>
-                            <option value="Ingreso">Ingreso</option>
-                            <option value="Egreso">Egreso</option>
-                        </select>
-                    </label>
-                    <label>
-                        Fecha:
-                        <div className="input-with-icon">
-                            <FaCalendarAlt className="icon" />
-                            <input type="date" name="fecha" value={formData.fecha} onChange={handleInputChange} required />
-                        </div>
-                    </label>
-                    <label>
-                        Descripción:
-                        <div className="input-with-icon">
-                            <FaClipboardList className="icon" />
-                            <input type="text" name="descripcion" value={formData.descripcion} onChange={handleInputChange} required />
-                        </div>
-                    </label>
-                    <label>
-                        Categoría:
-                        <input type="text" name="categoria" value={formData.categoria} onChange={handleInputChange} required />
-                    </label>
-                    <label>
-                        Monto:
-                        <div className="input-with-icon">
-                            <FaMoneyBillWave className="icon" />
-                            <input type="number" name="monto" value={formData.monto} onChange={handleInputChange} required />
-                        </div>
-                    </label>
-                    <label>
-                        Método de Pago:
-                        <div className="input-with-icon">
-                            <FaCreditCard className="icon" />
-                            <select name="metodoPago" value={formData.metodoPago} onChange={handleInputChange}>
-                                <option value="Efectivo">Efectivo</option>
-                                <option value="Transferencia">Transferencia</option>
-                                <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
-                            </select>
-                        </div>
-                    </label>
-                    <div className="form-buttons">
-                        <button type="submit" className="submit-button">Guardar</button>
-                        <button type="button" className="cancel-button" onClick={() => setShowForm(false)}>
-                            <FaTimes className="icon" /> Cancelar
-                        </button>
-                    </div>
-                </form>
-            )}
-            <div className="transactions-table">
-                <h3>Transacciones Registradas</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Fecha</th>
-                            <th>Descripción</th>
-                            <th>Categoría</th>
-                            <th>Tipo</th>
-                            <th>Monto</th>
-                            <th>Método de Pago</th>
-                            <th>Acciones</th>
+            <Button className="add-button" onClick={() => setShowCreateModal(true)}>
+                + Agregar Registro
+            </Button>
+            <input
+                type="text"
+                className="search-input"
+                placeholder="Buscar por categoría, tipo o usuario"
+                value={search}
+                onChange={handleSearch}
+            />
+            <table className="table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Categoría</th>
+                        <th>Descripción</th>
+                        <th>Monto</th>
+                        <th>Usuario</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {filteredRegistros.map((registro) => (
+                        <tr key={registro.Id}>
+                            <td>{registro.Fecha}</td>
+                            <td>{registro.Tipo}</td>
+                            <td>{registro.Categoria}</td>
+                            <td>{registro.Descripcion}</td>
+                            <td>${registro.Monto.toLocaleString('es-CL')}</td>
+                            <td>{registro.UsuarioNombre || 'No asignado'}</td>
+                            <td>
+                                <Button
+                                    variant="danger"
+                                    className="delete-button"
+                                    onClick={() => handleDeleteRegistro(registro.Id)}
+                                >
+                                    Eliminar
+                                </Button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {transactions.map((transaction, index) => (
-                            <tr key={index}>
-                                <td>{index + 1}</td>
-                                <td>{transaction.fecha}</td>
-                                <td>{transaction.descripcion}</td>
-                                <td>{transaction.categoria}</td>
-                                <td>{transaction.tipo}</td>
-                                <td>{transaction.monto}</td>
-                                <td>{transaction.metodoPago}</td>
-                                <td>
-                                    <button className="edit-button">Editar</button>
-                                    <button className="delete-button">Eliminar</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                    ))}
+                </tbody>
+            </table>
+
+            <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Crear Registro</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="create-form">
+                        <select
+                            value={newRegistro.Tipo}
+                            onChange={(e) => setNewRegistro({ ...newRegistro, Tipo: e.target.value })}
+                        >
+                            <option value="ingreso">Ingreso</option>
+                            <option value="egreso">Egreso</option>
+                        </select>
+                        <input
+                            type="text"
+                            placeholder="Categoría"
+                            value={newRegistro.Categoria}
+                            onChange={(e) => setNewRegistro({ ...newRegistro, Categoria: e.target.value })}
+                        />
+                        <textarea
+                            placeholder="Descripción"
+                            value={newRegistro.Descripcion}
+                            onChange={(e) => setNewRegistro({ ...newRegistro, Descripcion: e.target.value })}
+                        />
+                        <input
+                            type="number"
+                            placeholder="Monto"
+                            value={newRegistro.Monto}
+                            onChange={(e) => setNewRegistro({ ...newRegistro, Monto: e.target.value })}
+                        />
+                        <input
+                            type="date"
+                            value={newRegistro.Fecha}
+                            onChange={(e) => setNewRegistro({ ...newRegistro, Fecha: e.target.value })}
+                        />
+                        <input
+                            type="number"
+                            placeholder="ID del Usuario"
+                            value={newRegistro.IdUsuario}
+                            onChange={(e) => setNewRegistro({ ...newRegistro, IdUsuario: e.target.value })}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="success" onClick={handleCreateRegistro}>
+                        Crear
+                    </Button>
+                    <Button variant="danger" onClick={() => setShowCreateModal(false)}>
+                        Cancelar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

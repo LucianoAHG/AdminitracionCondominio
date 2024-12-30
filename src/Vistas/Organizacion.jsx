@@ -1,38 +1,49 @@
-﻿import React from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FaUserTie, FaEnvelope, FaPhone, FaEdit, FaTrash } from 'react-icons/fa';
-import '/src/CSS/Organizacion.css';
+import axios from 'axios';
+import '../CSS/Organizacion.css';
 
 const Organizacion = () => {
-    const data = [
-        { nombre: 'Juan Pérez', rol: 'Presidente', contacto: 'juan.perez@example.com', telefono: '+56912345678' },
-        { nombre: 'María Gómez', rol: 'Secretario', contacto: 'maria.gomez@example.com', telefono: '+56998765432' },
-        { nombre: 'Carlos Sánchez', rol: 'Tesorero', contacto: 'carlos.sanchez@example.com', telefono: '+56911223344' },
-    ];
+    const [miembros, setMiembros] = useState([]);
+    const baseUrl = 'http://localhost:3000/api/organizacion';
+
+    useEffect(() => {
+        fetchMiembros();
+    }, []);
+
+    const fetchMiembros = async () => {
+        try {
+            const response = await axios.get(baseUrl);
+            setMiembros(response.data.data);
+        } catch (error) {
+            console.error('Error al obtener los miembros:', error);
+        }
+    };
 
     return (
         <div className="organizacion-container">
             <h2>Composición del Comité</h2>
             <div className="organizacion-grid">
-                {data.map((miembro, index) => (
-                    <div key={index} className={`organizacion-card ${miembro.rol.toLowerCase()}`}>
+                {miembros.map((miembro, index) => (
+                    <div key={index} className={`organizacion-card ${miembro.Rol.toLowerCase()}`}>
                         <div className="card-content">
                             <FaUserTie className="card-icon" />
                             <div className="card-info">
-                                <h3 className="card-name">{miembro.nombre}</h3>
-                                <p className="card-role">{miembro.rol}</p>
+                                <h3 className="card-name">{miembro.NombreUsuario}</h3>
+                                <p className="card-role">{miembro.Rol}</p>
                                 <p className="card-contact">
-                                    <FaEnvelope className="contact-icon" /> {miembro.contacto}
+                                    <FaEnvelope className="contact-icon" /> {miembro.Contacto}
                                 </p>
                                 <p className="card-phone">
-                                    <FaPhone className="phone-icon" /> {miembro.telefono}
+                                    <FaPhone className="phone-icon" /> {miembro.Telefono}
                                 </p>
                             </div>
                         </div>
                         <div className="card-actions">
-                            <button className="edit-button">
+                            <button className="edit-button" disabled>
                                 <FaEdit /> Editar
                             </button>
-                            <button className="delete-button">
+                            <button className="delete-button" disabled>
                                 <FaTrash /> Eliminar
                             </button>
                         </div>

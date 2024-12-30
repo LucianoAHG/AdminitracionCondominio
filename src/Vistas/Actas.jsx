@@ -1,138 +1,190 @@
-﻿import React, { useState } from 'react';
-import '/src/CSS/Actas.css'; 
+﻿import React, { useState, useEffect } from 'react';
+import { Modal, Button } from 'react-bootstrap';
+import axios from 'axios';
+import '../CSS/Actas.css';
 
 const Actas = () => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [showModal, setShowModal] = useState(false);
+    const [actas, setActas] = useState([]);
+    const [search, setSearch] = useState('');
+    const [filteredActas, setFilteredActas] = useState([]);
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const [newActa, setNewActa] = useState({
-        fecha: '',
-        numero: '',
-        detalle: '',
-        acuerdo: '',
-        invitados: '',
+        Fecha: '',
+        Numero: '', // Agregado el campo Número
+        Detalle: '',
+        Acuerdo: '',
+        Invitados: '',
     });
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [searchDate, setSearchDate] = useState('');
+    const baseUrl = '190.113.0.136:3306/api/actas';
 
-    const actasData = [
-        { fecha: '07/abr/2020', numero: '1', detalle: 'Reunión ordinaria del centro', acuerdo: 'Cobrar las cuotas', invitados: '' },
-        { fecha: '02/abr/2020', numero: '2', detalle: 'Pago', acuerdo: '...', invitados: '..' },
-        { fecha: '13/abr/2020', numero: '3', detalle: 'Pago', acuerdo: '...', invitados: '..' },
-        { fecha: '13/abr/2020', numero: '4', detalle: 'Pago', acuerdo: '...', invitados: '..' },
-    ];
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setNewActa({ ...newActa, [name]: value });
+    // Obtener el token JWT almacenado en localStorage
+    const getAuthHeader = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error("Token no encontrado en localStorage. Asegúrate de iniciar sesión.");
+        }
+        return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
-    const handleAddActa = () => {
-        console.log('Nueva acta:', newActa);
-        setShowModal(false);
-        setNewActa({ fecha: '', numero: '', detalle: '', acuerdo: '', invitados: '' });
+    useEffect(() => {
+        fetchActas();
+    }, []);
+
+    const fetchActas = async () => {
+        try {
+            const response = await axios.get(baseUrl, {
+                headers: getAuthHeader(),
+            });
+            console.log('Respuesta del backend:', response);
+            setActas(response.data); // Directamente asigna response.data
+            setFilteredActas(response.data);
+        } catch (error) {
+            console.error('Error al obtener las actas:', error.response?.data || error.message);
+        }
     };
 
-    const nextActa = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % filteredActas.length);
-    };
-
-    const prevActa = () => {
-        setCurrentIndex((prevIndex) => (prevIndex - 1 + filteredActas.length) % filteredActas.length);
-    };
-
-    // Filtrar actas según el término de búsqueda o la fecha
-    const filteredActas = actasData.filter((acta) => {
-        const matchesTerm = searchTerm
-            ? Object.values(acta).some((value) =>
-                value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    const handleSearch = (e) => {
+        const value = e.target.value.toLowerCase();
+        setSearch(value);
+        setFilteredActas(
+            actas.filter(
+                (acta) =>
+                    acta.Detalle.toLowerCase().includes(value) ||
+                    acta.Acuerdo.toLowerCase().includes(value)
             )
-            : true; // Si no hay término de búsqueda, incluir todo
-        const matchesDate = searchDate ? acta.fecha.includes(searchDate) : true; // Si no hay fecha, incluir todo
-        return matchesTerm && matchesDate;
-    });
+        );
+    };
 
-    // Verificar si hay resultados y ajustar el índice
-    if (filteredActas.length === 0 && currentIndex !== 0) {
-        setCurrentIndex(0); // Restablecer el índice si no hay resultados
-    }
+    const handleCreateActa = async () => {
+        console.log('Datos enviados:', newActa); // Depuración
+
+        try {
+            const response = await axios.post(baseUrl, newActa, {
+                headers: getAuthHeader(),
+            });
+            if (response.data.status === 'success') {
+                alert('Acta creada con éxito');
+                setShowCreateModal(false);
+                setNewActa({ Fecha: '', Numero: '', Detalle: '', Acuerdo: '', Invitados: '' }); // Restablecer estado
+                fetchActas();
+            } else {
+                console.error('Error al crear el acta:', response.data.message);
+            }
+        } catch (error) {
+            console.error('Error al crear el acta:', error.response?.data || error.message);
+        }
+    };
+
+    const handleDeleteActa = async (id) => {
+        if (window.confirm('¿Estás seguro de que deseas eliminar esta acta?')) {
+            try {
+                const response = await axios.delete(`${baseUrl}/${id}`, {
+                    headers: getAuthHeader(),
+                });
+                if (response.data.status === 'success') {
+                    alert('Acta eliminada con éxito');
+                    fetchActas();
+                } else {
+                    console.error('Error al eliminar el acta:', response.data.message);
+                }
+            } catch (error) {
+                console.error('Error al eliminar el acta:', error.response?.data || error.message);
+            }
+        }
+    };
 
     return (
-        <div className="actas-container-unique">
+        <div className="actas-container">
             <h2>Gestión de Actas</h2>
-            <div className="search-container-unique">
-                <input
-                    type="text"
-                    placeholder="Buscar por término..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input-unique"
-                />
-                <input
-                    type="date"
-                    placeholder="Buscar por fecha..."
-                    value={searchDate}
-                    onChange={(e) => setSearchDate(e.target.value)}
-                    className="search-input-unique"
-                />
-            </div>
-            <button className="add-button-unique" onClick={() => setShowModal(true)}>+ Agregar Acta</button>
-            <div className="carrusel-container-unique">
-                {filteredActas.length > 0 ? (
-                    <>
-                        <button className="nav-button-unique prev-button-unique" onClick={prevActa}>⟨</button>
-                        <div className="acta-card-unique">
-                            <p className="acta-date-unique">{filteredActas[currentIndex].fecha}</p>
-                            <h3 className="acta-number-unique">Acta #{filteredActas[currentIndex].numero}</h3>
-                            <p><strong>Detalle:</strong> {filteredActas[currentIndex].detalle}</p>
-                            <p><strong>Acuerdo:</strong> {filteredActas[currentIndex].acuerdo}</p>
-                            <p><strong>Invitados:</strong> {filteredActas[currentIndex].invitados}</p>
-                            <div className="acta-actions-unique">
-                                <button className="view-button-unique">👁️</button>
-                                <button className="edit-button-unique">✏️</button>
-                                <button className="delete-button-unique">🗑️</button>
-                            </div>
-                        </div>
-                        <button className="nav-button-unique next-button-unique" onClick={nextActa}>⟩</button>
-                    </>
-                ) : (
-                    <p>No hay actas disponibles que coincidan con la búsqueda.</p>
-                )}
-            </div>
+            <Button className="add-button" onClick={() => setShowCreateModal(true)}>
+                + Agregar Acta
+            </Button>
+            <input
+                type="text"
+                className="search-input"
+                placeholder="Buscar por detalle o acuerdo"
+                value={search}
+                onChange={handleSearch}
+            />
+            <table className="table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Número</th>
+                        <th>Detalle</th>
+                        <th>Acuerdo</th>
+                        <th>Invitados</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {filteredActas.map((acta) => (
+                        <tr key={acta.Id}>
+                            <td>{acta.Fecha || 'No registrada'}</td>
+                            <td>{acta.Numero || 'No registrado'}</td>
+                            <td>{acta.Detalle || 'No registrado'}</td>
+                            <td>{acta.Acuerdo || 'No registrado'}</td>
+                            <td>{acta.Invitados || 'No registrados'}</td>
+                            <td>
+                                <Button
+                                    variant="danger"
+                                    className="delete-button"
+                                    onClick={() => handleDeleteActa(acta.Id)}
+                                >
+                                    Eliminar
+                                </Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
 
-            {showModal && (
-                <div className="modal-overlay-unique">
-                    <div className="modal-content-unique">
-                        <h3>Crear Nueva Acta</h3>
-                        <form>
-                            <div className="form-group-unique">
-                                <label htmlFor="fecha">Fecha:</label>
-                                <input type="date" id="fecha" name="fecha" value={newActa.fecha} onChange={handleChange} />
-                            </div>
-                            <div className="form-group-unique">
-                                <label htmlFor="numero">Número:</label>
-                                <input type="text" id="numero" name="numero" value={newActa.numero} onChange={handleChange} />
-                            </div>
-                            <div className="form-group-unique">
-                                <label htmlFor="detalle">Detalle:</label>
-                                <textarea id="detalle" name="detalle" value={newActa.detalle} onChange={handleChange}></textarea>
-                            </div>
-                            <div className="form-group-unique">
-                                <label htmlFor="acuerdo">Acuerdo:</label>
-                                <input type="text" id="acuerdo" name="acuerdo" value={newActa.acuerdo} onChange={handleChange} />
-                            </div>
-                            <div className="form-group-unique">
-                                <label htmlFor="invitados">Invitados:</label>
-                                <input type="text" id="invitados" name="invitados" value={newActa.invitados} onChange={handleChange} />
-                            </div>
-                            <div className="modal-buttons-unique">
-                                <button type="button" onClick={handleAddActa} className="save-button-unique">Guardar</button>
-                                <button type="button" onClick={() => setShowModal(false)} className="cancel-button-unique">Cancelar</button>
-                            </div>
-                        </form>
+            {/* Modal para Crear Acta */}
+            <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Crear Acta</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="create-form">
+                        <input
+                            type="date"
+                            placeholder="Fecha"
+                            value={newActa.Fecha}
+                            onChange={(e) => setNewActa({ ...newActa, Fecha: e.target.value })}
+                        />
+                        <input
+                            type="number"
+                            placeholder="Número"
+                            value={newActa.Numero} // Campo para Número
+                            onChange={(e) => setNewActa({ ...newActa, Numero: e.target.value })}
+                        />
+                        <textarea
+                            placeholder="Detalle"
+                            value={newActa.Detalle}
+                            onChange={(e) => setNewActa({ ...newActa, Detalle: e.target.value })}
+                        />
+                        <textarea
+                            placeholder="Acuerdo"
+                            value={newActa.Acuerdo}
+                            onChange={(e) => setNewActa({ ...newActa, Acuerdo: e.target.value })}
+                        />
+                        <textarea
+                            placeholder="Invitados"
+                            value={newActa.Invitados}
+                            onChange={(e) => setNewActa({ ...newActa, Invitados: e.target.value })}
+                        />
                     </div>
-                </div>
-            )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="success" onClick={handleCreateActa}>
+                        Crear
+                    </Button>
+                    <Button variant="danger" onClick={() => setShowCreateModal(false)}>
+                        Cancelar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

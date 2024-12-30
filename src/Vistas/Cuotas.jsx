@@ -1,107 +1,207 @@
-﻿import React, { useState } from 'react';
-import '/src/CSS/Cuotas.css';
+﻿import React, { useState, useEffect } from 'react';
+import { Modal, Button } from 'react-bootstrap';
+import axios from 'axios';
+import '../CSS/Cuotas.css';
+
 const Cuotas = () => {
-    // Datos de ejemplo 
-    const data = [
-        { nombre: 'Elias', rol: 'Socio', estado: 'Pendiente', monto: 1000, pagadas: 0, pendientes: 8, fecha: '2024-01-01' },
-        { nombre: 'Jesus', rol: 'Socio', estado: 'Pagada', monto: 1000, pagadas: 4, pendientes: 5, fecha: '2023-02-15' },
-        { nombre: 'Machado', rol: 'Administrador', estado: 'Pagada', monto: 1000, pagadas: 7, pendientes: 2, fecha: '2024-03-10' },
-        { nombre: 'Doe John', rol: 'Socio', estado: 'Pagada', monto: 1000, pagadas: 4, pendientes: 5, fecha: '2023-01-20' },
-        { nombre: 'Perez Juanito', rol: 'Tesorero', estado: 'Pagada', monto: 1000, pagadas: 6, pendientes: 3, fecha: '2024-04-05' },
-        { nombre: 'Luciano', rol: 'Socio', estado: 'Pagada', monto: 1000, pagadas: 3, pendientes: 6, fecha: '2024-02-28' },
-    ];
-
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedYear, setSelectedYear] = useState('');
-    const [selectedMonth, setSelectedMonth] = useState('');
-
-    // Obtener un conjunto único de años de los datos para el filtro
-    const years = [...new Set(data.map(item => item.fecha.split('-')[0]))];
-
-    // Meses para desplegar en el filtro
-    const months = [
-        { value: '', label: 'Todos los meses' },
-        { value: '01', label: 'Enero' },
-        { value: '02', label: 'Febrero' },
-        { value: '03', label: 'Marzo' },
-        { value: '04', label: 'Abril' },
-        { value: '05', label: 'Mayo' },
-        { value: '06', label: 'Junio' },
-        { value: '07', label: 'Julio' },
-        { value: '08', label: 'Agosto' },
-        { value: '09', label: 'Septiembre' },
-        { value: '10', label: 'Octubre' },
-        { value: '11', label: 'Noviembre' },
-        { value: '12', label: 'Diciembre' },
-    ];
-
-    // Filtrar datos según la búsqueda por nombre, año y mes seleccionado
-    const filteredData = data.filter((item) => {
-        const matchesName = item.nombre.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesYear = selectedYear ? item.fecha.startsWith(selectedYear) : true;
-        const matchesMonth = selectedMonth ? item.fecha.split('-')[1] === selectedMonth : true;
-        return matchesName && matchesYear && matchesMonth;
+    const [cuotas, setCuotas] = useState([]);
+    const [usuarios, setUsuarios] = useState([]);
+    const [filteredUsuarios, setFilteredUsuarios] = useState([]);
+    const [searchUsuario, setSearchUsuario] = useState('');
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [newCuota, setNewCuota] = useState({
+        IdUsuario: '',
+        Monto: '',
+        Estado: 'Pendiente',
+        FechaPago: '',
     });
+    const [assignToAll, setAssignToAll] = useState(false);
+    const [meses, setMeses] = useState('');
+
+    const baseUrlCuotas = 'http://localhost:3000/api/cuotas';
+    const baseUrlUsuarios = 'http://localhost:3000/api/usuarios';
+
+    const getAuthHeader = () => {
+        const token = localStorage.getItem('token');
+        return token ? { Authorization: `Bearer ${token}` } : {};
+    };
+
+    useEffect(() => {
+        fetchCuotas();
+        fetchUsuarios();
+    }, []);
+
+    const fetchCuotas = async () => {
+        try {
+            const response = await axios.get(baseUrlCuotas, {
+                headers: getAuthHeader(),
+            });
+            setCuotas(Array.isArray(response.data) ? response.data : []);
+        } catch (error) {
+            console.error('Error al obtener cuotas:', error);
+        }
+    };
+
+    const fetchUsuarios = async () => {
+        try {
+            const response = await axios.get(baseUrlUsuarios, {
+                headers: getAuthHeader(),
+            });
+            const usuariosData = Array.isArray(response.data) ? response.data : [];
+            setUsuarios(usuariosData);
+            setFilteredUsuarios(usuariosData);
+        } catch (error) {
+            console.error('Error al obtener usuarios:', error);
+            setUsuarios([]);
+            setFilteredUsuarios([]);
+        }
+    };
+
+    const handleCreateCuota = async () => {
+        try {
+            if (assignToAll) {
+                const usuariosRolUsuario = usuarios.filter((usuario) => usuario.Rol === 'Usuario');
+                await Promise.all(
+                    usuariosRolUsuario.map((usuario) =>
+                        axios.post(
+                            baseUrlCuotas,
+                            {
+                                IdUsuario: usuario.Id,
+                                Monto: newCuota.Monto,
+                                Estado: newCuota.Estado,
+                                FechaPago: newCuota.FechaPago,
+                                Meses: meses,
+                            },
+                            { headers: getAuthHeader() }
+                        )
+                    )
+                );
+            } else {
+                await axios.post(
+                    baseUrlCuotas,
+                    { ...newCuota, Meses: meses },
+                    { headers: getAuthHeader() }
+                );
+            }
+            alert('Cuota(s) creada(s) con éxito');
+            setShowCreateModal(false);
+            setNewCuota({ IdUsuario: '', Monto: '', Estado: 'Pendiente', FechaPago: '' });
+            setMeses('');
+            setAssignToAll(false);
+            fetchCuotas();
+        } catch (error) {
+            console.error('Error al crear cuota:', error);
+        }
+    };
+
+    const handleSearchUsuario = (e) => {
+        const value = e.target.value.toLowerCase();
+        setSearchUsuario(value);
+        setFilteredUsuarios(
+            usuarios.filter(
+                (usuario) =>
+                    usuario.Nombre.toLowerCase().includes(value) ||
+                    usuario.Correo.toLowerCase().includes(value)
+            )
+        );
+    };
 
     return (
         <div className="cuotas-container">
-            <div className="filters-container">
-                <input
-                    type="text"
-                    placeholder="Buscar por nombre..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
-                />
-                <select
-                    value={selectedYear}
-                    onChange={(e) => {
-                        setSelectedYear(e.target.value);
-                        setSelectedMonth(''); // Resetear el mes cuando se cambia el año
-                    }}
-                    className="search-input"
-                >
-                    <option value="">Todos los años</option>
-                    {years.map((year, index) => (
-                        <option key={index} value={year}>
-                            {year}
-                        </option>
+            <h2>Gestión de Cuotas</h2>
+            <Button className="add-button" onClick={() => setShowCreateModal(true)}>
+                + Crear Cuota
+            </Button>
+            <table className="table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                        <th>Fecha de Pago</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {cuotas.map((cuota) => (
+                        <tr key={cuota.Id}>
+                            <td>{cuota.UsuarioNombre || 'No asignado'}</td>
+                            <td>${cuota.Monto?.toLocaleString('es-CL')}</td>
+                            <td>{cuota.Estado}</td>
+                            <td>{cuota.FechaPago || 'No registrada'}</td>
+                            <td>
+                                {/* Agregar acciones si es necesario */}
+                            </td>
+                        </tr>
                     ))}
-                </select>
-                <select
-                    value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="search-input"
-                    disabled={!selectedYear} // Deshabilitar si no hay un año seleccionado
-                >
-                    {months.map((month, index) => (
-                        <option key={index} value={month.value}>
-                            {month.label}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div className="cards-container">
-                {filteredData.length > 0 ? (
-                    filteredData.map((item, index) => (
-                        <div key={index} className="cuota-card">
-                            <h3>{item.nombre}</h3>
-                            <p className="rol">@{item.rol}</p>
-                            <p className={`estado ${item.estado.toLowerCase()}`}>{item.estado}</p>
-                            <p className="monto">${item.monto.toLocaleString('es-CL')}</p> {/* Formato de moneda */}
-                            <button className={`pagar-button ${item.estado === 'Pendiente' ? 'active' : ''}`}>
-                                {item.estado === 'Pendiente' ? 'Pagar' : 'Pagado'}
-                            </button>
-                            <div className="cuota-details">
-                                <p><strong>{item.pagadas}</strong> Pagadas</p>
-                                <p><strong>{item.pendientes}</strong> Pendientes</p>
-                            </div>
+                </tbody>
+            </table>
+
+            {/* Modal para Crear Cuota */}
+            <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Crear Cuota</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="create-form">
+                        <select
+                            value={newCuota.IdUsuario}
+                            onChange={(e) => setNewCuota({ ...newCuota, IdUsuario: e.target.value })}
+                            disabled={assignToAll}
+                        >
+                            <option value="">Seleccionar Usuario</option>
+                            {Array.isArray(filteredUsuarios) &&
+                                filteredUsuarios.map((usuario) => (
+                                    <option key={usuario.Id} value={usuario.Id}>
+                                        {usuario.Nombre} - {usuario.Correo}
+                                    </option>
+                                ))}
+                        </select>
+                        <div>
+                            <input
+                                type="checkbox"
+                                id="assignToAll"
+                                checked={assignToAll}
+                                onChange={(e) => setAssignToAll(e.target.checked)}
+                            />
+                            <label htmlFor="assignToAll">Asignar a todos los usuarios</label>
                         </div>
-                    ))
-                ) : (
-                    <p>No se encontraron resultados.</p>
-                )}
-            </div>
+                        <input
+                            type="number"
+                            placeholder="Monto"
+                            value={newCuota.Monto}
+                            onChange={(e) => setNewCuota({ ...newCuota, Monto: e.target.value })}
+                        />
+                        <input
+                            type="number"
+                            placeholder="Meses"
+                            value={meses}
+                            onChange={(e) => setMeses(e.target.value)}
+                        />
+                        <select
+                            value={newCuota.Estado}
+                            onChange={(e) => setNewCuota({ ...newCuota, Estado: e.target.value })}
+                        >
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Pagada">Pagada</option>
+                        </select>
+                        <input
+                            type="date"
+                            placeholder="Fecha de Pago"
+                            value={newCuota.FechaPago}
+                            onChange={(e) => setNewCuota({ ...newCuota, FechaPago: e.target.value })}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="success" onClick={handleCreateCuota}>
+                        Crear
+                    </Button>
+                    <Button variant="danger" onClick={() => setShowCreateModal(false)}>
+                        Cancelar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
