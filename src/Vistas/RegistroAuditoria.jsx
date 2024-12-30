@@ -1,24 +1,41 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FaSearch, FaEye } from 'react-icons/fa';
-import '/src/CSS/RegistroAuditoria.css';
+import axios from 'axios';
+import '../CSS/RegistroAuditoria.css';
 
 const RegistroAuditoria = () => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [auditoriaData, setAuditoriaData] = useState([]);
 
-    // Datos de ejemplo (pueden ser reemplazados con datos reales desde una API o base de datos)
-    const auditoriaData = [
-        { id: 1, nombre: 'Juan Pérez', fecha: '2024-11-19', hora: '14:30', accion: 'Realizó un pago' },
-        { id: 2, nombre: 'María Gómez', fecha: '2024-11-19', hora: '15:45', accion: 'Editó su correo' },
-        { id: 3, nombre: 'Carlos Sánchez', fecha: '2024-11-19', hora: '16:10', accion: 'Inició sesión en la página' },
-        { id: 4, nombre: 'Ana Torres', fecha: '2024-11-18', hora: '09:00', accion: 'Eliminó un archivo' },
-        { id: 5, nombre: 'Pedro Martínez', fecha: '2024-11-18', hora: '11:15', accion: 'Modificó su contraseña' },
-    ];
+    const baseUrl = 'http://localhost:3000/api/auditoria';
+
+    // Obtener encabezados de autenticación
+    const getAuthHeader = () => {
+        const token = localStorage.getItem('token'); // Suponiendo que el token está en localStorage
+        return token ? { Authorization: `Bearer ${token}` } : {};
+    };
+
+    useEffect(() => {
+        fetchAuditoria();
+    }, []);
+
+    const fetchAuditoria = async () => {
+        try {
+            const response = await axios.get(baseUrl, { headers: getAuthHeader() });
+            setAuditoriaData(response.data.data);
+        } catch (error) {
+            console.error('Error al obtener los registros de auditoría:', error);
+        }
+    };
 
     // Filtrar registros por término de búsqueda (nombre o ID)
-    const filteredData = auditoriaData.filter((registro) =>
-        registro.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        registro.id.toString().includes(searchTerm)
-    );
+    const filteredData = auditoriaData.filter((registro) => {
+        const usuarioNombre = registro.UsuarioNombre || 'No disponible';
+        return (
+            usuarioNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            registro.Id.toString().includes(searchTerm)
+        );
+    });
 
     return (
         <div className="registro-auditoria-container">
@@ -48,12 +65,12 @@ const RegistroAuditoria = () => {
                     <tbody>
                         {filteredData.length > 0 ? (
                             filteredData.map((registro) => (
-                                <tr key={registro.id}>
-                                    <td>{registro.id}</td>
-                                    <td>{registro.nombre}</td>
-                                    <td>{registro.fecha}</td>
-                                    <td>{registro.hora}</td>
-                                    <td>{registro.accion}</td>
+                                <tr key={registro.Id}>
+                                    <td>{registro.Id}</td>
+                                    <td>{registro.UsuarioNombre || 'No disponible'}</td>
+                                    <td>{registro.Fecha}</td>
+                                    <td>{registro.Hora}</td>
+                                    <td>{registro.Accion}</td>
                                     <td>
                                         <button className="view-button">
                                             <FaEye /> Ver

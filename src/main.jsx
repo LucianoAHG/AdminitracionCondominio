@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from '/src/Vistas/Login.jsx'; 
 import MainMenu from '/src/Vistas/Mainmenu.jsx';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>

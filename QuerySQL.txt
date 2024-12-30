@@ -1,0 +1,144 @@
+-- Crear la base de datos
+CREATE DATABASE SistemaAuditoria;
+GO
+
+-- Usar la base de datos
+USE SistemaAuditoria;
+GO
+
+-- Tabla roles
+CREATE TABLE Roles (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(50) NOT NULL
+);
+GO
+
+-- Tabla usuarios
+CREATE TABLE Usuarios (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(100) NOT NULL,
+    Correo NVARCHAR(100) NOT NULL UNIQUE,
+    Telefono NVARCHAR(15),
+    Password NVARCHAR(255) NOT NULL,
+    IdRol INT NOT NULL,
+    FOREIGN KEY (IdRol) REFERENCES Roles(Id)
+);
+GO
+
+-- Tabla permisos
+CREATE TABLE Permisos (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(100) NOT NULL,
+    IdRol INT NOT NULL,
+    FOREIGN KEY (IdRol) REFERENCES Roles(Id)
+);
+GO
+
+-- Tabla auditoria
+CREATE TABLE Auditoria (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    IdUsuario INT NOT NULL,
+    Accion NVARCHAR(MAX) NOT NULL,
+    Fecha DATE NOT NULL,
+    Hora TIME NOT NULL,
+    FOREIGN KEY (IdUsuario) REFERENCES Usuarios(Id)
+);
+GO
+
+-- Tabla organizacion
+CREATE TABLE Organizacion (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(100) NOT NULL,
+    Rol NVARCHAR(50) NOT NULL,
+    Contacto NVARCHAR(100)
+);
+GO
+
+-- Tabla cuotas
+CREATE TABLE Cuotas (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    IdUsuario INT NOT NULL,
+    Monto DECIMAL(10, 2) NOT NULL,
+    Estado NVARCHAR(20) NOT NULL CHECK (Estado IN ('Pendiente', 'Pagada')),
+    FechaPago DATE,
+    FOREIGN KEY (IdUsuario) REFERENCES Usuarios(Id)
+);
+GO
+
+-- Tabla actas
+CREATE TABLE Actas (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Fecha DATE NOT NULL,
+    Numero INT NOT NULL,
+    Detalle NVARCHAR(MAX),
+    Acuerdo NVARCHAR(MAX),
+    Invitados NVARCHAR(MAX)
+);
+GO
+
+-- Tabla ingresos_egresos
+CREATE TABLE IngresosEgresos (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Tipo NVARCHAR(10) NOT NULL CHECK (Tipo IN ('ingreso', 'egreso')),
+    Categoria NVARCHAR(20) NOT NULL CHECK (Categoria IN ('arriendo', 'ventas', 'aportes', 'otros')),
+    Descripcion NVARCHAR(MAX),
+    Monto DECIMAL(10, 2) NOT NULL,
+    Fecha DATE NOT NULL,
+    IdUsuario INT NOT NULL,
+    FOREIGN KEY (IdUsuario) REFERENCES Usuarios(Id)
+);
+GO
+
+-- Insertar roles predefinidos
+INSERT INTO Roles (Nombre) VALUES
+('Administrador'),
+('Presidente'),
+('Secretario'),
+('Tesorero'),
+('Usuario');
+GO
+
+-- Insertar permisos predefinidos (ejemplo)
+INSERT INTO Permisos (Nombre, IdRol) VALUES
+('Crear Acta', 2),
+('Editar Acta', 2),
+('Ver Auditoría', 1),
+('Registrar Cuota', 4),
+('Ver Organización', 3);
+GO
+
+-- Insertar usuarios de ejemplo
+INSERT INTO Usuarios (Nombre, Correo, Telefono, Password, IdRol) VALUES
+('Juan Pérez', 'juan.perez@example.com', '56912345678', 'hashed_password_juan', 1),
+('María Gómez', 'maria.gomez@example.com', '56998765432', 'hashed_password_maria', 2),
+('Carlos Sánchez', 'carlos.sanchez@example.com', '56911223344', 'hashed_password_carlos', 4),
+('Ana Torres', 'ana.torres@example.com', '56999887766', 'hashed_password_ana', 3),
+('Pedro Martínez', 'pedro.martinez@example.com', '56966554433', 'hashed_password_pedro', 5);
+GO
+
+-- Insertar datos en organizacion
+INSERT INTO Organizacion (Nombre, Rol, Contacto) VALUES
+('Juan Pérez', 'Presidente', 'juan.perez@example.com'),
+('María Gómez', 'Secretario', 'maria.gomez@example.com'),
+('Carlos Sánchez', 'Tesorero', 'carlos.sanchez@example.com');
+GO
+
+-- Insertar datos en cuotas
+INSERT INTO Cuotas (IdUsuario, Monto, Estado, FechaPago) VALUES
+(2, 1000.00, 'Pendiente', NULL),
+(3, 2000.00, 'Pagada', '2024-11-15');
+GO
+
+-- Insertar actas de ejemplo
+INSERT INTO Actas (Fecha, Numero, Detalle, Acuerdo, Invitados) VALUES
+('2024-11-10', 1, 'Reunión para definir presupuestos', 'Aprobación del presupuesto anual', 'María Gómez, Carlos Sánchez'),
+('2024-11-12', 2, 'Planificación de eventos', 'Organización de la feria anual', 'Juan Pérez, Ana Torres');
+GO
+
+-- Insertar ingresos/egresos de ejemplo
+INSERT INTO IngresosEgresos (Tipo, Categoria, Descripcion, Monto, Fecha, IdUsuario) VALUES
+('ingreso', 'ventas', 'Venta de productos en feria', 500.00, '2024-11-20', 2),
+('egreso', 'arriendo', 'Pago mensual de oficina', 300.00, '2024-11-20', 3),
+('ingreso', 'aportes', 'Donación de socio', 200.00, '2024-11-19', 4),
+('egreso', 'otros', 'Compra de materiales para eventos', 150.00, '2024-11-18', 5);
+GO
