@@ -5,7 +5,7 @@ import '../CSS/Organizacion.css';
 
 const Organizacion = () => {
     const [miembros, setMiembros] = useState([]);
-    const baseUrl = 'http://localhost:3000/api/organizacion';
+    const baseUrl = 'https://elias.go.miorganizacion.cl/api/organizacion.php';
 
     useEffect(() => {
         fetchMiembros();
@@ -14,9 +14,14 @@ const Organizacion = () => {
     const fetchMiembros = async () => {
         try {
             const response = await axios.get(baseUrl);
-            setMiembros(response.data.data);
+            console.log('Miembros:', response.data);
+            if (response.data.status === 'success') {
+                setMiembros(response.data.data);
+            } else {
+                console.error('Error al obtener los miembros:', response.data.message);
+            }
         } catch (error) {
-            console.error('Error al obtener los miembros:', error);
+            console.error('Error al obtener los miembros:', error.message);
         }
     };
 
@@ -24,8 +29,8 @@ const Organizacion = () => {
         <div className="organizacion-container">
             <h2>Composición del Comité</h2>
             <div className="organizacion-grid">
-                {miembros.map((miembro, index) => (
-                    <div key={index} className={`organizacion-card ${miembro.Rol.toLowerCase()}`}>
+                {miembros.map((miembro) => (
+                    <div key={miembro.IdOrganizacion} className={`organizacion-card ${miembro.Rol.toLowerCase()}`}>
                         <div className="card-content">
                             <FaUserTie className="card-icon" />
                             <div className="card-info">

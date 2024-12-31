@@ -6,8 +6,6 @@ import '../CSS/Cuotas.css';
 const Cuotas = () => {
     const [cuotas, setCuotas] = useState([]);
     const [usuarios, setUsuarios] = useState([]);
-    const [filteredUsuarios, setFilteredUsuarios] = useState([]);
-    const [searchUsuario, setSearchUsuario] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newCuota, setNewCuota] = useState({
         IdUsuario: '',
@@ -15,95 +13,82 @@ const Cuotas = () => {
         Estado: 'Pendiente',
         FechaPago: '',
     });
-    const [assignToAll, setAssignToAll] = useState(false);
-    const [meses, setMeses] = useState('');
 
-    const baseUrlCuotas = 'http://localhost:3000/api/cuotas';
-    const baseUrlUsuarios = 'http://localhost:3000/api/usuarios';
-
-    const getAuthHeader = () => {
-        const token = localStorage.getItem('token');
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    };
+    const baseUrlCuotas = 'https://elias.go.miorganizacion.cl/api/cuotas.php';
+    const baseUrlUsuarios = 'https://elias.go.miorganizacion.cl/api/usuarios.php';
 
     useEffect(() => {
         fetchCuotas();
         fetchUsuarios();
     }, []);
 
+    // Fetch cuotas from the backend
     const fetchCuotas = async () => {
         try {
-            const response = await axios.get(baseUrlCuotas, {
-                headers: getAuthHeader(),
-            });
-            setCuotas(Array.isArray(response.data) ? response.data : []);
+            const response = await axios.get(`${baseUrlCuotas}?action=fetch`);
+            if (response.data.status === 'success') {
+                setCuotas(response.data.data || []);
+            } else {
+                console.error('Error al obtener cuotas:', response.data.message);
+                setCuotas([]);
+            }
         } catch (error) {
-            console.error('Error al obtener cuotas:', error);
+            console.error('Error al obtener cuotas:', error.message);
         }
     };
 
+    // Fetch usuarios from the backend
     const fetchUsuarios = async () => {
         try {
-            const response = await axios.get(baseUrlUsuarios, {
-                headers: getAuthHeader(),
-            });
-            const usuariosData = Array.isArray(response.data) ? response.data : [];
-            setUsuarios(usuariosData);
-            setFilteredUsuarios(usuariosData);
+            const response = await axios.get(`${baseUrlUsuarios}?action=fetch`);
+            console.log('Respuesta de usuarios:', response.data); // Depuración
+            if (response.data.status === 'success') {
+                setUsuarios(response.data.data || []);
+            } else {
+                console.error('Error al obtener usuarios:', response.data.message);
+                setUsuarios([]);
+            }
         } catch (error) {
-            console.error('Error al obtener usuarios:', error);
+            console.error('Error al obtener usuarios:', error.message);
             setUsuarios([]);
-            setFilteredUsuarios([]);
         }
     };
 
     const handleCreateCuota = async () => {
+        if (!newCuota.IdUsuario || !newCuota.Monto) {
+            alert('Por favor, selecciona un usuario y completa el monto.');
+            return;
+        }
+
         try {
-            if (assignToAll) {
-                const usuariosRolUsuario = usuarios.filter((usuario) => usuario.Rol === 'Usuario');
-                await Promise.all(
-                    usuariosRolUsuario.map((usuario) =>
-                        axios.post(
-                            baseUrlCuotas,
-                            {
-                                IdUsuario: usuario.Id,
-                                Monto: newCuota.Monto,
-                                Estado: newCuota.Estado,
-                                FechaPago: newCuota.FechaPago,
-                                Meses: meses,
-                            },
-                            { headers: getAuthHeader() }
-                        )
-                    )
-                );
+            const response = await axios.post(`${baseUrlCuotas}?action=create`, newCuota);
+            if (response.data.status === 'success') {
+                alert('Cuota creada exitosamente');
+                setShowCreateModal(false);
+                setNewCuota({ IdUsuario: '', Monto: '', Estado: 'Pendiente', FechaPago: '' });
+                fetchCuotas();
             } else {
-                await axios.post(
-                    baseUrlCuotas,
-                    { ...newCuota, Meses: meses },
-                    { headers: getAuthHeader() }
-                );
+                console.error('Error al crear cuota:', response.data.message);
             }
-            alert('Cuota(s) creada(s) con éxito');
-            setShowCreateModal(false);
-            setNewCuota({ IdUsuario: '', Monto: '', Estado: 'Pendiente', FechaPago: '' });
-            setMeses('');
-            setAssignToAll(false);
-            fetchCuotas();
         } catch (error) {
-            console.error('Error al crear cuota:', error);
+            console.error('Error al crear cuota:', error.message);
         }
     };
 
-    const handleSearchUsuario = (e) => {
-        const value = e.target.value.toLowerCase();
-        setSearchUsuario(value);
-        setFilteredUsuarios(
-            usuarios.filter(
-                (usuario) =>
-                    usuario.Nombre.toLowerCase().includes(value) ||
-                    usuario.Correo.toLowerCase().includes(value)
-            )
-        );
+    const handleDeleteCuota = async (id) => {
+        if (window.confirm('¿Estás seguro de que deseas eliminar esta cuota?')) {
+            try {
+                const response = await axios.get(`${baseUrlCuotas}?action=delete&id=${id}`);
+                if (response.data.status === 'success') {
+                    alert('Cuota eliminada exitosamente');
+                    fetchCuotas();
+                } else {
+                    console.error('Error al eliminar cuota:', response.data.message);
+                }
+            } catch (error) {
+                console.error('Error al eliminar cuota:', error.message);
+            }
+        }
     };
 
     return (
@@ -126,18 +111,23 @@ const Cuotas = () => {
                     {cuotas.map((cuota) => (
                         <tr key={cuota.Id}>
                             <td>{cuota.UsuarioNombre || 'No asignado'}</td>
-                            <td>${cuota.Monto?.toLocaleString('es-CL')}</td>
+                            <td>${parseFloat(cuota.Monto || 0).toLocaleString('es-CL')}</td>
                             <td>{cuota.Estado}</td>
                             <td>{cuota.FechaPago || 'No registrada'}</td>
                             <td>
-                                {/* Agregar acciones si es necesario */}
+                                <Button
+                                    variant="danger"
+                                    className="delete-button"
+                                    onClick={() => handleDeleteCuota(cuota.Id)}
+                                >
+                                    Eliminar
+                                </Button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
-            {/* Modal para Crear Cuota */}
             <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Crear Cuota</Modal.Title>
@@ -147,36 +137,23 @@ const Cuotas = () => {
                         <select
                             value={newCuota.IdUsuario}
                             onChange={(e) => setNewCuota({ ...newCuota, IdUsuario: e.target.value })}
-                            disabled={assignToAll}
                         >
                             <option value="">Seleccionar Usuario</option>
-                            {Array.isArray(filteredUsuarios) &&
-                                filteredUsuarios.map((usuario) => (
+                            {usuarios.length > 0 ? (
+                                usuarios.map((usuario) => (
                                     <option key={usuario.Id} value={usuario.Id}>
                                         {usuario.Nombre} - {usuario.Correo}
                                     </option>
-                                ))}
+                                ))
+                            ) : (
+                                <option value="">No hay usuarios disponibles</option>
+                            )}
                         </select>
-                        <div>
-                            <input
-                                type="checkbox"
-                                id="assignToAll"
-                                checked={assignToAll}
-                                onChange={(e) => setAssignToAll(e.target.checked)}
-                            />
-                            <label htmlFor="assignToAll">Asignar a todos los usuarios</label>
-                        </div>
                         <input
                             type="number"
                             placeholder="Monto"
                             value={newCuota.Monto}
                             onChange={(e) => setNewCuota({ ...newCuota, Monto: e.target.value })}
-                        />
-                        <input
-                            type="number"
-                            placeholder="Meses"
-                            value={meses}
-                            onChange={(e) => setMeses(e.target.value)}
                         />
                         <select
                             value={newCuota.Estado}
