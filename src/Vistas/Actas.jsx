@@ -10,22 +10,14 @@ const Actas = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newActa, setNewActa] = useState({
         Fecha: '',
-        Numero: '', // Agregado el campo Número
+        Numero: '',
         Detalle: '',
         Acuerdo: '',
         Invitados: '',
     });
 
-    const baseUrl = '190.113.0.136:3306/api/actas';
-
-    // Obtener el token JWT almacenado en localStorage
-    const getAuthHeader = () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error("Token no encontrado en localStorage. Asegúrate de iniciar sesión.");
-        }
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    };
+    // Base URL configurada para el servidor PHP
+    const baseUrl = 'https://elias.go.miorganizacion.cl/api/actas.php';
 
     useEffect(() => {
         fetchActas();
@@ -33,14 +25,20 @@ const Actas = () => {
 
     const fetchActas = async () => {
         try {
-            const response = await axios.get(baseUrl, {
-                headers: getAuthHeader(),
-            });
-            console.log('Respuesta del backend:', response);
-            setActas(response.data); // Directamente asigna response.data
-            setFilteredActas(response.data);
+            const response = await axios.get(baseUrl);
+            console.log('Respuesta del backend:', response.data);
+
+            // Verificar que la respuesta sea válida
+            if (response.data.status === 'success' && Array.isArray(response.data.data)) {
+                setActas(response.data.data);
+                setFilteredActas(response.data.data);
+            } else {
+                console.error('Error al obtener las actas:', response.data.message || 'Formato no válido');
+                setActas([]);
+                setFilteredActas([]);
+            }
         } catch (error) {
-            console.error('Error al obtener las actas:', error.response?.data || error.message);
+            console.error('Error al obtener las actas:', error.message);
         }
     };
 
@@ -57,31 +55,29 @@ const Actas = () => {
     };
 
     const handleCreateActa = async () => {
-        console.log('Datos enviados:', newActa); // Depuración
-
         try {
-            const response = await axios.post(baseUrl, newActa, {
-                headers: getAuthHeader(),
-            });
+            const response = await axios.post(baseUrl, newActa);
+            console.log('Respuesta de creación:', response.data);
+
             if (response.data.status === 'success') {
                 alert('Acta creada con éxito');
                 setShowCreateModal(false);
-                setNewActa({ Fecha: '', Numero: '', Detalle: '', Acuerdo: '', Invitados: '' }); // Restablecer estado
+                setNewActa({ Fecha: '', Numero: '', Detalle: '', Acuerdo: '', Invitados: '' });
                 fetchActas();
             } else {
                 console.error('Error al crear el acta:', response.data.message);
             }
         } catch (error) {
-            console.error('Error al crear el acta:', error.response?.data || error.message);
+            console.error('Error al crear el acta:', error.message);
         }
     };
 
     const handleDeleteActa = async (id) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar esta acta?')) {
             try {
-                const response = await axios.delete(`${baseUrl}/${id}`, {
-                    headers: getAuthHeader(),
-                });
+                const response = await axios.delete(`${baseUrl}?id=${id}`);
+                console.log('Respuesta de eliminación:', response.data);
+
                 if (response.data.status === 'success') {
                     alert('Acta eliminada con éxito');
                     fetchActas();
@@ -89,7 +85,7 @@ const Actas = () => {
                     console.error('Error al eliminar el acta:', response.data.message);
                 }
             } catch (error) {
-                console.error('Error al eliminar el acta:', error.response?.data || error.message);
+                console.error('Error al eliminar el acta:', error.message);
             }
         }
     };
@@ -156,7 +152,7 @@ const Actas = () => {
                         <input
                             type="number"
                             placeholder="Número"
-                            value={newActa.Numero} // Campo para Número
+                            value={newActa.Numero}
                             onChange={(e) => setNewActa({ ...newActa, Numero: e.target.value })}
                         />
                         <textarea

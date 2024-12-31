@@ -12,30 +12,47 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            // Realizar la solicitud de inicio de sesión al backend
-            const response = await axios.post('http://go.miorganizacion.cl:3000/api/login', {
-                Correo: correo,
-                Password: password,
-            });
 
-            if (response.data.status === 'success') {
+        // Validación de campos vacíos
+        if (!correo.trim() || !password.trim()) {
+            setError('Por favor, complete todos los campos.');
+            return;
+        }
+
+        try {
+            // Realizar la solicitud de inicio de sesión al backend PHP
+            const response = await axios.post(
+                'https://elias.go.miorganizacion.cl/api/login.php?action=login',
+                {
+                    Correo: correo.trim(),
+                    Password: password.trim(),
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            console.log('Respuesta del servidor:', response);
+
+            if (response.data && response.data.status === 'success') {
                 const user = response.data.data;
                 console.log('Usuario autenticado:', user);
 
                 // Almacenar datos básicos en localStorage
                 localStorage.setItem('userId', user.Id);
                 localStorage.setItem('userName', user.Nombre);
-                localStorage.setItem('userRole', user.RolNombre);
+                localStorage.setItem('userRole', user.Rol);
 
                 // Redirigir al menú principal
                 navigate('/Menu_Principal');
             } else {
-                setError(response.data.message || 'Error desconocido');
+                setError(response.data.message || 'Credenciales incorrectas.');
             }
         } catch (err) {
             console.error('Error en el inicio de sesión:', err);
-            setError('Error al iniciar sesión. Verifique sus credenciales.');
+            setError('Error al conectar con el servidor. Intente nuevamente más tarde.');
         }
     };
 

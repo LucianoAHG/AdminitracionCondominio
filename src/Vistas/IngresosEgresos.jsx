@@ -5,6 +5,7 @@ import '../CSS/IngresosEgresos.css';
 
 const IngresosEgresos = () => {
     const [registros, setRegistros] = useState([]);
+    const [usuarios, setUsuarios] = useState([]);
     const [search, setSearch] = useState('');
     const [filteredRegistros, setFilteredRegistros] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -17,12 +18,7 @@ const IngresosEgresos = () => {
         IdUsuario: ''
     });
 
-    const baseUrl = 'http://localhost:3000/api/ingresos-egresos';
-
-    const getAuthHeader = () => {
-        const token = localStorage.getItem('token');
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    };
+    const baseUrl = 'https://elias.go.miorganizacion.cl/api/ingresosEgresos.php';
 
     useEffect(() => {
         fetchRegistros();
@@ -30,12 +26,34 @@ const IngresosEgresos = () => {
 
     const fetchRegistros = async () => {
         try {
-            const response = await axios.get(baseUrl, { headers: getAuthHeader() });
-            setRegistros(response.data.data);
-            setFilteredRegistros(response.data.data);
+            const response = await axios.get(`${baseUrl}?action=fetch`);
+            if (response.data.status === 'success') {
+                setRegistros(response.data.data || []);
+                setFilteredRegistros(response.data.data || []);
+            } else {
+                console.error('Error al obtener los registros:', response.data.message);
+            }
         } catch (error) {
-            console.error('Error al obtener los registros:', error);
+            console.error('Error al obtener los registros:', error.message);
         }
+    };
+
+    const fetchUsuarios = async () => {
+        try {
+            const response = await axios.get(`${baseUrl}?action=fetchUsers`);
+            if (response.data.status === 'success') {
+                setUsuarios(response.data.data || []);
+            } else {
+                console.error('Error al obtener usuarios:', response.data.message);
+            }
+        } catch (error) {
+            console.error('Error al obtener usuarios:', error.message);
+        }
+    };
+
+    const handleOpenModal = () => {
+        fetchUsuarios();
+        setShowCreateModal(true);
     };
 
     const handleSearch = (e) => {
@@ -53,24 +71,32 @@ const IngresosEgresos = () => {
 
     const handleCreateRegistro = async () => {
         try {
-            await axios.post(baseUrl, newRegistro, { headers: getAuthHeader() });
-            alert('Registro creado con éxito');
-            setShowCreateModal(false);
-            setNewRegistro({ Tipo: 'ingreso', Categoria: '', Descripcion: '', Monto: '', Fecha: '', IdUsuario: '' });
-            fetchRegistros();
+            const response = await axios.post(baseUrl, newRegistro);
+            if (response.data.status === 'success') {
+                alert('Registro creado con éxito');
+                setShowCreateModal(false);
+                setNewRegistro({ Tipo: 'ingreso', Categoria: '', Descripcion: '', Monto: '', Fecha: '', IdUsuario: '' });
+                fetchRegistros();
+            } else {
+                console.error('Error al crear el registro:', response.data.message);
+            }
         } catch (error) {
-            console.error('Error al crear el registro:', error);
+            console.error('Error al crear el registro:', error.message);
         }
     };
 
     const handleDeleteRegistro = async (id) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar este registro?')) {
             try {
-                await axios.delete(`${baseUrl}/${id}`, { headers: getAuthHeader() });
-                alert('Registro eliminado con éxito');
-                fetchRegistros();
+                const response = await axios.delete(`${baseUrl}?id=${id}`);
+                if (response.data.status === 'success') {
+                    alert('Registro eliminado con éxito');
+                    fetchRegistros();
+                } else {
+                    console.error('Error al eliminar el registro:', response.data.message);
+                }
             } catch (error) {
-                console.error('Error al eliminar el registro:', error);
+                console.error('Error al eliminar el registro:', error.message);
             }
         }
     };
@@ -78,7 +104,7 @@ const IngresosEgresos = () => {
     return (
         <div className="ingresos-egresos-container">
             <h2>Gestión de Ingresos y Egresos</h2>
-            <Button className="add-button" onClick={() => setShowCreateModal(true)}>
+            <Button className="add-button" onClick={handleOpenModal}>
                 + Agregar Registro
             </Button>
             <input
@@ -107,7 +133,7 @@ const IngresosEgresos = () => {
                             <td>{registro.Tipo}</td>
                             <td>{registro.Categoria}</td>
                             <td>{registro.Descripcion}</td>
-                            <td>${registro.Monto.toLocaleString('es-CL')}</td>
+                            <td>${parseFloat(registro.Monto || 0).toLocaleString('es-CL')}</td>
                             <td>{registro.UsuarioNombre || 'No asignado'}</td>
                             <td>
                                 <Button
@@ -158,12 +184,17 @@ const IngresosEgresos = () => {
                             value={newRegistro.Fecha}
                             onChange={(e) => setNewRegistro({ ...newRegistro, Fecha: e.target.value })}
                         />
-                        <input
-                            type="number"
-                            placeholder="ID del Usuario"
+                        <select
                             value={newRegistro.IdUsuario}
                             onChange={(e) => setNewRegistro({ ...newRegistro, IdUsuario: e.target.value })}
-                        />
+                        >
+                            <option value="">Seleccionar Usuario</option>
+                            {usuarios.map((usuario) => (
+                                <option key={usuario.Id} value={usuario.Id}>
+                                    {usuario.Nombre}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>

@@ -19,14 +19,8 @@ const Usuarios = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
 
-    const baseUrlUsuarios = 'http://localhost:3000/api/usuarios';
-    const baseUrlRoles = 'http://localhost:3000/api/roles';
-
-    // Obtener encabezado de autenticación JWT
-    const getAuthHeader = () => {
-        const token = localStorage.getItem('token');
-        return token ? { Authorization: `Bearer ${token}` } : {};
-    };
+    const baseUrlUsuarios = 'https://elias.go.miorganizacion.cl/api/usuarios.php';
+    const baseUrlRoles = 'https://elias.go.miorganizacion.cl/api/roles.php';
 
     useEffect(() => {
         fetchUsuarios();
@@ -35,8 +29,8 @@ const Usuarios = () => {
 
     const fetchUsuarios = async () => {
         try {
-            const response = await axios.get(baseUrlUsuarios, { headers: getAuthHeader() });
-            setUsuarios(response.data.data);
+            const response = await axios.get(`${baseUrlUsuarios}?action=fetch`);
+            setUsuarios(response.data.data || []);
         } catch (error) {
             console.error('Error al obtener usuarios:', error);
         }
@@ -44,8 +38,8 @@ const Usuarios = () => {
 
     const fetchRoles = async () => {
         try {
-            const response = await axios.get(baseUrlRoles, { headers: getAuthHeader() });
-            setRoles(response.data.data);
+            const response = await axios.get(baseUrlRoles);
+            setRoles(response.data.data || []);
         } catch (error) {
             console.error('Error al obtener roles:', error);
         }
@@ -63,22 +57,18 @@ const Usuarios = () => {
         } else {
             await handleCreateUsuario();
         }
-        setShowModal(false); // Cierra el modal después de la acción
+        setShowModal(false);
     };
 
     const handleCreateUsuario = async () => {
         try {
-            await axios.post(
-                baseUrlUsuarios,
-                {
-                    Nombre: formData.usuarioNombre,
-                    Correo: formData.usuarioCorreo,
-                    Telefono: formData.usuarioTelefono,
-                    Password: formData.usuarioPassword,
-                    IdRol: formData.usuarioRol
-                },
-                { headers: getAuthHeader() }
-            );
+            await axios.post(baseUrlUsuarios, {
+                Nombre: formData.usuarioNombre,
+                Correo: formData.usuarioCorreo,
+                Telefono: formData.usuarioTelefono,
+                Password: formData.usuarioPassword,
+                IdRol: formData.usuarioRol
+            });
             alert('Usuario creado con éxito');
             fetchUsuarios();
             resetForm();
@@ -89,17 +79,14 @@ const Usuarios = () => {
 
     const handleUpdateUsuario = async () => {
         try {
-            await axios.put(
-                `${baseUrlUsuarios}/${editId}`,
-                {
-                    Nombre: formData.usuarioNombre,
-                    Correo: formData.usuarioCorreo,
-                    Telefono: formData.usuarioTelefono,
-                    Password: formData.usuarioPassword,
-                    IdRol: formData.usuarioRol
-                },
-                { headers: getAuthHeader() }
-            );
+            await axios.put(baseUrlUsuarios, {
+                Id: editId,
+                Nombre: formData.usuarioNombre,
+                Correo: formData.usuarioCorreo,
+                Telefono: formData.usuarioTelefono,
+                Password: formData.usuarioPassword,
+                IdRol: formData.usuarioRol
+            });
             alert('Usuario actualizado con éxito');
             fetchUsuarios();
             resetForm();
@@ -108,10 +95,10 @@ const Usuarios = () => {
         }
     };
 
-    const handleDeleteUsuario = async (Id) => {
+    const handleDeleteUsuario = async (id) => {
         if (window.confirm('¿Estás seguro de eliminar este usuario?')) {
             try {
-                await axios.delete(`${baseUrlUsuarios}/${Id}`, { headers: getAuthHeader() });
+                await axios.delete(baseUrlUsuarios, { data: { Id: id } });
                 alert('Usuario eliminado con éxito');
                 fetchUsuarios();
             } catch (error) {
@@ -122,13 +109,13 @@ const Usuarios = () => {
 
     const prepareEditUsuario = (usuario) => {
         setFormData({
-            usuarioNombre: usuario.Nombre,
-            usuarioCorreo: usuario.Correo,
-            usuarioTelefono: usuario.Telefono,
+            usuarioNombre: usuario?.Nombre || '',
+            usuarioCorreo: usuario?.Correo || '',
+            usuarioTelefono: usuario?.Telefono || '',
             usuarioPassword: '',
-            usuarioRol: roles.find((rol) => rol.Nombre === usuario.RolNombre)?.Id || ''
+            usuarioRol: roles.find((rol) => rol.Nombre === usuario?.RolNombre)?.Id || ''
         });
-        setEditId(usuario.Id);
+        setEditId(usuario?.Id);
         setIsEditing(true);
         setShowModal(true);
     };
@@ -172,22 +159,16 @@ const Usuarios = () => {
                 </thead>
                 <tbody>
                     {usuarios.map((usuario) => (
-                        <tr key={usuario.Id}>
-                            <td>{usuario.Nombre}</td>
-                            <td>{usuario.Correo}</td>
-                            <td>{usuario.Telefono}</td>
-                            <td>{usuario.RolNombre || 'Sin Rol'}</td>
+                        <tr key={usuario?.Id}>
+                            <td>{usuario?.Nombre || 'Sin Nombre'}</td>
+                            <td>{usuario?.Correo || 'Sin Correo'}</td>
+                            <td>{usuario?.Telefono || 'Sin Teléfono'}</td>
+                            <td>{usuario?.RolNombre || 'Sin Rol'}</td>
                             <td>
-                                <button
-                                    className="edit-button"
-                                    onClick={() => prepareEditUsuario(usuario)}
-                                >
+                                <button className="edit-button" onClick={() => prepareEditUsuario(usuario)}>
                                     <FontAwesomeIcon icon={faEdit} />
                                 </button>
-                                <button
-                                    className="delete-button"
-                                    onClick={() => handleDeleteUsuario(usuario.Id)}
-                                >
+                                <button className="delete-button" onClick={() => handleDeleteUsuario(usuario?.Id)}>
                                     <FontAwesomeIcon icon={faTrash} />
                                 </button>
                             </td>
