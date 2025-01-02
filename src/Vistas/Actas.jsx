@@ -16,7 +16,12 @@ const Actas = () => {
         Invitados: '',
     });
 
-    // Base URL configurada para el servidor PHP
+    // Verificar si el usuario tiene permiso para realizar estas acciones
+    const userRole = localStorage.getItem('userRole') || 'Rol Usuario';
+
+    // Los roles que pueden gestionar actas
+    const canManageActas = ['Administrador', 'Secretario', 'Presidente'].includes(userRole);
+
     const baseUrl = 'https://elias.go.miorganizacion.cl/api/actas.php';
 
     useEffect(() => {
@@ -26,14 +31,10 @@ const Actas = () => {
     const fetchActas = async () => {
         try {
             const response = await axios.get(baseUrl);
-            console.log('Respuesta del backend:', response.data);
-
-            // Verificar que la respuesta sea válida
             if (response.data.status === 'success' && Array.isArray(response.data.data)) {
                 setActas(response.data.data);
                 setFilteredActas(response.data.data);
             } else {
-                console.error('Error al obtener las actas:', response.data.message || 'Formato no válido');
                 setActas([]);
                 setFilteredActas([]);
             }
@@ -55,17 +56,14 @@ const Actas = () => {
     };
 
     const handleCreateActa = async () => {
+        if (!canManageActas) return;
         try {
             const response = await axios.post(baseUrl, newActa);
-            console.log('Respuesta de creación:', response.data);
-
             if (response.data.status === 'success') {
                 alert('Acta creada con éxito');
                 setShowCreateModal(false);
                 setNewActa({ Fecha: '', Numero: '', Detalle: '', Acuerdo: '', Invitados: '' });
                 fetchActas();
-            } else {
-                console.error('Error al crear el acta:', response.data.message);
             }
         } catch (error) {
             console.error('Error al crear el acta:', error.message);
@@ -73,29 +71,26 @@ const Actas = () => {
     };
 
     const handleDeleteActa = async (id) => {
-        if (window.confirm('¿Estás seguro de que deseas eliminar esta acta?')) {
-            try {
-                const response = await axios.delete(`${baseUrl}?id=${id}`);
-                console.log('Respuesta de eliminación:', response.data);
-
-                if (response.data.status === 'success') {
-                    alert('Acta eliminada con éxito');
-                    fetchActas();
-                } else {
-                    console.error('Error al eliminar el acta:', response.data.message);
-                }
-            } catch (error) {
-                console.error('Error al eliminar el acta:', error.message);
+        if (!canManageActas || !window.confirm('¿Estás seguro de que deseas eliminar esta acta?')) return;
+        try {
+            const response = await axios.delete(`${baseUrl}?id=${id}`);
+            if (response.data.status === 'success') {
+                alert('Acta eliminada con éxito');
+                fetchActas();
             }
+        } catch (error) {
+            console.error('Error al eliminar el acta:', error.message);
         }
     };
 
     return (
         <div className="actas-container">
             <h2>Gestión de Actas</h2>
-            <Button className="add-button" onClick={() => setShowCreateModal(true)}>
-                + Agregar Acta
-            </Button>
+            {canManageActas && (
+                <Button className="add-button" onClick={() => setShowCreateModal(true)}>
+                    + Agregar Acta
+                </Button>
+            )}
             <input
                 type="text"
                 className="search-input"
@@ -123,20 +118,21 @@ const Actas = () => {
                             <td>{acta.Acuerdo || 'No registrado'}</td>
                             <td>{acta.Invitados || 'No registrados'}</td>
                             <td>
-                                <Button
-                                    variant="danger"
-                                    className="delete-button"
-                                    onClick={() => handleDeleteActa(acta.Id)}
-                                >
-                                    Eliminar
-                                </Button>
+                                {canManageActas && (
+                                    <Button
+                                        variant="danger"
+                                        className="delete-button"
+                                        onClick={() => handleDeleteActa(acta.Id)}
+                                    >
+                                        Eliminar
+                                    </Button>
+                                )}
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
-            {/* Modal para Crear Acta */}
             <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Crear Acta</Modal.Title>

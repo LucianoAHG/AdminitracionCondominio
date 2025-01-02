@@ -1,5 +1,7 @@
 ﻿import React, { useState } from 'react';
-import { FaUserCircle, FaMoneyBill, FaClipboard, FaBalanceScale, FaUsers, FaFileAlt, FaSignOutAlt, FaUser } from 'react-icons/fa'; // Ejemplo de iconos
+import {
+    FaUserCircle, FaMoneyBill, FaClipboard, FaBalanceScale, FaUsers, FaFileAlt, FaSignOutAlt, FaUser
+} from 'react-icons/fa'; // Ejemplo de iconos
 import '../CSS/MainMenu.css';
 import IngresosEgresos from './IngresosEgresos.jsx';
 import Cuotas from '/src/Vistas/Cuotas.jsx';
@@ -12,23 +14,23 @@ import Resumen from '/src/Vistas/resumen.jsx';
 const MainMenu = () => {
     const [selectedMenu, setSelectedMenu] = useState('Cuota');
     const [showLogout, setShowLogout] = useState(false);
-    const userName = "Nombre Usuario";
-    const userRole = "Rol Usuario";
+
+    // Recuperar datos del usuario desde localStorage
+    const userName = localStorage.getItem('userName') || 'Nombre Usuario';
+    const userRole = localStorage.getItem('userRole') || 'Rol Usuario';
 
     const menuItems = [
-        { label: 'Acta', icon: <FaClipboard /> },
-        { label: 'Cuota', icon: <FaMoneyBill /> },
-        { label: 'Ingresos/Egresos', icon: <FaBalanceScale /> },
-        { label: 'Organización (Composición Comité)', icon: <FaUsers /> },
-        { label: 'Registro Auditoría', icon: <FaFileAlt /> },
-        { label: 'Usuarios', icon: <FaUser /> }, 
-        { label: 'Resumen', icon: <FaUser /> }
+        { label: 'Acta', icon: <FaClipboard />, roles: ['Administrador', 'Presidente', 'Secretario', 'Usuario'] },
+        { label: 'Cuota', icon: <FaMoneyBill />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Usuario'] },
+        { label: 'Ingresos/Egresos', icon: <FaBalanceScale />, roles: ['Administrador', 'Presidente', 'Tesorero'] },
+        { label: 'Organización (Composición Comité)', icon: <FaUsers />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Usuario'] },
+        { label: 'Registro Auditoría', icon: <FaFileAlt />, roles: ['Administrador', 'Presidente', ] },
+        { label: 'Usuarios', icon: <FaUser />, roles: ['Administrador', 'Presidente', ] },
+        { label: 'Resumen', icon: <FaUser />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Usuario'] }
     ];
 
-    // Ordenar el menú alfabéticamente
-    const sortedMenuItems = [...menuItems].sort((a, b) =>
-        a.label.localeCompare(b.label)
-    );
+    // Filtrar elementos del menú según el rol del usuario
+    const filteredMenuItems = menuItems.filter(item => item.roles.includes(userRole));
 
     const renderContent = () => {
         switch (selectedMenu) {
@@ -42,9 +44,9 @@ const MainMenu = () => {
                 return <Organizacion />;
             case 'Registro Auditoría':
                 return <RegistroAuditoria />;
-            case 'Usuarios': 
+            case 'Usuarios':
                 return <Usuarios />;
-            case 'Resumen': 
+            case 'Resumen':
                 return <Resumen />;
             default:
                 return <div>Seleccione una opción del menú</div>;
@@ -55,7 +57,7 @@ const MainMenu = () => {
         <div className="main-menu-container">
             <div className="menu-sidebar">
                 <ul>
-                    {sortedMenuItems.map((item, index) => (
+                    {filteredMenuItems.map((item, index) => (
                         <li
                             key={index}
                             className={selectedMenu === item.label ? 'active' : ''}
@@ -78,7 +80,11 @@ const MainMenu = () => {
                     {showLogout && (
                         <FaSignOutAlt
                             id="logout-icon"
-                            onClick={() => alert('Cerrar sesión')}
+                            onClick={() => {
+                                localStorage.clear();
+                                alert('Cerrando sesión...');
+                                window.location.href = '/login';
+                            }}
                         />
                     )}
                 </div>
