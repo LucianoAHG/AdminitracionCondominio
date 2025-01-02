@@ -17,6 +17,9 @@ const Cuotas = () => {
     const baseUrlCuotas = 'https://elias.go.miorganizacion.cl/api/cuotas.php';
     const baseUrlUsuarios = 'https://elias.go.miorganizacion.cl/api/usuarios.php';
 
+    const userRole = localStorage.getItem('userRole') || 'Rol Usuario';
+    const userId = localStorage.getItem('userId'); // Suponiendo que el ID de usuario se guarda en localStorage
+
     useEffect(() => {
         fetchCuotas();
         fetchUsuarios();
@@ -27,7 +30,13 @@ const Cuotas = () => {
         try {
             const response = await axios.get(`${baseUrlCuotas}?action=fetch`);
             if (response.data.status === 'success') {
-                setCuotas(response.data.data || []);
+                if (userRole === 'Usuario') {
+                    // Filtrar solo las cuotas del usuario actual
+                    setCuotas(response.data.data.filter(cuota => cuota.IdUsuario === userId));
+                } else {
+                    // Mostrar todas las cuotas si el usuario tiene roles superiores
+                    setCuotas(response.data.data || []);
+                }
             } else {
                 console.error('Error al obtener cuotas:', response.data.message);
                 setCuotas([]);
@@ -41,7 +50,6 @@ const Cuotas = () => {
     const fetchUsuarios = async () => {
         try {
             const response = await axios.get(`${baseUrlUsuarios}?action=fetch`);
-            console.log('Respuesta de usuarios:', response.data); // Depuración
             if (response.data.status === 'success') {
                 setUsuarios(response.data.data || []);
             } else {
@@ -91,12 +99,43 @@ const Cuotas = () => {
         }
     };
 
+    const handleUpdateEstadoCuota = async (id, newEstado) => {
+        try {
+            const response = await axios.get(`${baseUrlCuotas}?action=updateEstado&id=${id}&estado=${newEstado}`);
+            if (response.data.status === 'success') {
+                alert('Estado de la cuota actualizado');
+                fetchCuotas();
+            } else {
+                console.error('Error al actualizar el estado de la cuota:', response.data.message);
+            }
+        } catch (error) {
+            console.error('Error al actualizar el estado de la cuota:', error.message);
+        }
+    };
+
+    // Actualizar fecha de pago de la cuota
+    const handleUpdateFechaPago = async (id, newFechaPago) => {
+        try {
+            const response = await axios.get(`${baseUrlCuotas}?action=updateFechaPago&id=${id}&fechaPago=${newFechaPago}`);
+            if (response.data.status === 'success') {
+                alert('Fecha de pago actualizada');
+                fetchCuotas();
+            } else {
+                console.error('Error al actualizar la fecha de pago:', response.data.message);
+            }
+        } catch (error) {
+            console.error('Error al actualizar la fecha de pago:', error.message);
+        }
+    };
+
     return (
         <div className="cuotas-container">
             <h2>Gestión de Cuotas</h2>
-            <Button className="add-button" onClick={() => setShowCreateModal(true)}>
-                + Crear Cuota
-            </Button>
+            {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(userRole) && (
+                <Button className="add-button" onClick={() => setShowCreateModal(true)}>
+                    + Crear Cuota
+                </Button>
+            )}
             <table className="table">
                 <thead>
                     <tr>
@@ -112,16 +151,40 @@ const Cuotas = () => {
                         <tr key={cuota.Id}>
                             <td>{cuota.UsuarioNombre || 'No asignado'}</td>
                             <td>${parseFloat(cuota.Monto || 0).toLocaleString('es-CL')}</td>
-                            <td>{cuota.Estado}</td>
-                            <td>{cuota.FechaPago || 'No registrada'}</td>
                             <td>
-                                <Button
-                                    variant="danger"
-                                    className="delete-button"
-                                    onClick={() => handleDeleteCuota(cuota.Id)}
-                                >
-                                    Eliminar
-                                </Button>
+                                {userRole === 'Tesorero' ? (
+                                    <select
+                                        value={cuota.Estado}
+                                        onChange={(e) => handleUpdateEstadoCuota(cuota.Id, e.target.value)}
+                                    >
+                                        <option value="Pendiente">Pendiente</option>
+                                        <option value="Pagada">Pagada</option>
+                                    </select>
+                                ) : (
+                                    cuota.Estado
+                                )}
+                            </td>
+                            <td>
+                                {userRole === 'Tesorero' && cuota.Estado === 'Pagada' ? (
+                                    <input
+                                        type="date"
+                                        value={cuota.FechaPago || ''}
+                                        onChange={(e) => handleUpdateFechaPago(cuota.Id, e.target.value)}
+                                    />
+                                ) : (
+                                    cuota.FechaPago || 'No registrada'
+                                )}
+                            </td>
+                            <td>
+                                {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(userRole) && (
+                                    <Button
+                                        variant="danger"
+                                        className="delete-button"
+                                        onClick={() => handleDeleteCuota(cuota.Id)}
+                                    >
+                                        Eliminar
+                                    </Button>
+                                )}
                             </td>
                         </tr>
                     ))}
