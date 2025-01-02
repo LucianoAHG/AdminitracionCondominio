@@ -1,0 +1,18 @@
+[30-Dec-2024 17:18:01 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/api.php:88
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/api.php on line 88
+[30-Dec-2024 17:19:02 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/api.php:88
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/api.php on line 88
+[30-Dec-2024 17:19:35 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/api.php:88
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/api.php on line 88
+[30-Dec-2024 17:20:13 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/api.php:88
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/api.php on line 88
+[30-Dec-2024 17:44:28 UTC] PHP Warning:  require_once(../db.php): failed to open stream: No such file or directory in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php on line 3
+[30-Dec-2024 17:44:28 UTC] PHP Fatal error:  require_once(): Failed opening required '../db.php' (include_path='.:/opt/alt/php74/usr/share/pear') in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php on line 3
