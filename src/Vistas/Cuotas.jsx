@@ -30,12 +30,16 @@ const Cuotas = () => {
         try {
             const response = await axios.get(`${baseUrlCuotas}?action=fetch`);
             if (response.data.status === 'success') {
+                const fetchedCuotas = response.data.data || [];
+                console.log("Cuotas obtenidas:", fetchedCuotas);
+                console.log("ID del usuario actual:", userId);
+                
                 if (userRole === 'Usuario') {
-                    // Filtrar solo las cuotas del usuario actual
-                    setCuotas(response.data.data.filter(cuota => cuota.IdUsuario === userId));
+                    // Filtrar solo las cuotas del usuario actual (asegurando que ambos sean del mismo tipo)
+                    setCuotas(fetchedCuotas.filter(cuota => String(cuota.IdUsuario) === String(userId)));
                 } else {
                     // Mostrar todas las cuotas si el usuario tiene roles superiores
-                    setCuotas(response.data.data || []);
+                    setCuotas(fetchedCuotas);
                 }
             } else {
                 console.error('Error al obtener cuotas:', response.data.message);
@@ -45,6 +49,7 @@ const Cuotas = () => {
             console.error('Error al obtener cuotas:', error.message);
         }
     };
+    
 
     // Fetch usuarios from the backend
     const fetchUsuarios = async () => {
