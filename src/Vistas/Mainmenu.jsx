@@ -7,6 +7,7 @@ import Actas from '/src/Vistas/Actas.jsx';
 import Organizacion from '/src/Vistas/Organizacion.jsx';
 import RegistroAuditoria from '/src/Vistas/RegistroAuditoria.jsx';
 import Usuarios from '/src/Vistas/Usuarios.jsx';
+import Resumen from '/src/Vistas/resumen.jsx';
 
 const MainMenu = () => {
     const [selectedMenu, setSelectedMenu] = useState('Cuota');
@@ -20,7 +21,8 @@ const MainMenu = () => {
         { label: 'Ingresos/Egresos', icon: <FaBalanceScale /> },
         { label: 'Organización (Composición Comité)', icon: <FaUsers /> },
         { label: 'Registro Auditoría', icon: <FaFileAlt /> },
-        { label: 'Usuarios', icon: <FaUser /> } // Añadido Usuarios
+        { label: 'Usuarios', icon: <FaUser /> }, 
+        { label: 'Resumen', icon: <FaUser /> }
     ];
 
     // Ordenar el menú alfabéticamente
@@ -40,8 +42,10 @@ const MainMenu = () => {
                 return <Organizacion />;
             case 'Registro Auditoría':
                 return <RegistroAuditoria />;
-            case 'Usuarios': // Añadido el renderizado para Usuarios
+            case 'Usuarios': 
                 return <Usuarios />;
+            case 'Resumen': 
+                return <Resumen />;
             default:
                 return <div>Seleccione una opción del menú</div>;
         }
