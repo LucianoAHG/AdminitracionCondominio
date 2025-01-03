@@ -1,16 +1,31 @@
-﻿import React from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import '../CSS/Resumen.css';
+import axios from 'axios';
 
 const Resumen = () => {
-    const cuotas = [
-        { estado: 'Pagadas', cantidad: 40 },
-        { estado: 'Pendientes', cantidad: 15 },
-    ];
+    const [cuotas, setCuotas] = useState({ pagadas: 0, pendientes: 0 });
+    const [actasRecientes, setActasRecientes] = useState([]);
 
-    const actasRecientes = [
-        { id: 1, titulo: 'Reunión Anual', fecha: '2024-01-15' },
-        { id: 2, titulo: 'Revisión de Presupuesto', fecha: '2024-02-10' },
-    ];
+    const fetchResumen = async () => {
+        try {
+            const response = await axios.get('https://elias.go.miorganizacion.cl/api/resumen.php');
+            if (response.data.status === 'success') {
+                setCuotas({
+                    pagadas: response.data.data.cuotas.pagadas,
+                    pendientes: response.data.data.cuotas.pendientes,
+                });
+                setActasRecientes(response.data.data.actas);
+            } else {
+                console.error('Error al obtener datos del resumen:', response.data.message);
+            }
+        } catch (error) {
+            console.error('Error al obtener datos del resumen:', error.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchResumen();
+    }, []);
 
     const notificaciones = [
         'Nueva cuota asignada a los usuarios.',
@@ -29,12 +44,14 @@ const Resumen = () => {
             <h1 id="resumen-title">Panel de Resumen</h1>
 
             <div id="resumen-stats-container">
-                {cuotas.map((cuota) => (
-                    <div key={`cuota-${cuota.estado}`} className="resumen-stat-item">
-                        <p className="resumen-stat-title">Cuotas {cuota.estado}</p>
-                        <p className="resumen-stat-value">{cuota.cantidad}</p>
-                    </div>
-                ))}
+                <div className="resumen-stat-item">
+                    <p className="resumen-stat-title">Cuotas Pagadas</p>
+                    <p className="resumen-stat-value">{cuotas.pagadas}</p>
+                </div>
+                <div className="resumen-stat-item">
+                    <p className="resumen-stat-title">Cuotas Pendientes</p>
+                    <p className="resumen-stat-value">{cuotas.pendientes}</p>
+                </div>
             </div>
 
             <div id="resumen-content-container">
