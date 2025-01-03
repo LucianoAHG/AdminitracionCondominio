@@ -25,6 +25,32 @@ try {
 
         echo json_encode(['status' => 'success', 'data' => $cuotas]);
 
+    } elseif ($action === 'delete') {
+        // Eliminar cuota
+        $Id = $_GET['id'] ?? null;
+
+        if (!$Id) {
+            echo json_encode(['status' => 'error', 'message' => 'El parámetro Id es obligatorio']);
+            exit;
+        }
+
+        $query = "DELETE FROM Cuotas WHERE Id = ?";
+        $stmt = $conn->prepare($query);
+
+        if (!$stmt) {
+            echo json_encode(['status' => 'error', 'message' => 'Error al preparar la consulta']);
+            exit;
+        }
+
+        $stmt->bind_param('i', $Id);
+        $stmt->execute();
+
+        if ($stmt->affected_rows > 0) {
+            echo json_encode(['status' => 'success', 'message' => 'Cuota eliminada exitosamente']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'No se encontró una cuota con el ID especificado']);
+        }
+
     } elseif ($action === 'updateFechaPago') {
         // Actualizar fecha de pago
         $Id = $_GET['id'] ?? null;
@@ -72,7 +98,28 @@ try {
 
         echo json_encode(['status' => 'success', 'message' => 'Estado de la cuota actualizado exitosamente']);
 
-    } else {
+    } elseif ($action === 'create') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $IdUsuarios = $data['IdUsuarios'] ?? [];
+        $Monto = $data['Monto'] ?? null;
+        $Estado = $data['Estado'] ?? 'Pendiente';
+        $FechaPago = $data['FechaPago'] ?? null;
+    
+        if (empty($IdUsuarios) || !$Monto) {
+            echo json_encode(['status' => 'error', 'message' => 'IdUsuarios y Monto son obligatorios']);
+            exit;
+        }
+    
+        $query = "INSERT INTO Cuotas (IdUsuario, Monto, Estado, FechaPago) VALUES (?, ?, ?, ?)";
+        $stmt = $conn->prepare($query);
+    
+        foreach ($IdUsuarios as $IdUsuario) {
+            $stmt->bind_param('iiss', $IdUsuario, $Monto, $Estado, $FechaPago);
+            $stmt->execute();
+        }
+    
+        echo json_encode(['status' => 'success', 'message' => 'Cuotas creadas exitosamente']);
+    }else {
         echo json_encode(['status' => 'error', 'message' => 'Acción no válida']);
     }
 } catch (Exception $e) {

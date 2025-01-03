@@ -8,7 +8,7 @@ const Cuotas = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newCuota, setNewCuota] = useState({
-        IdUsuario: '',
+        IdUsuarios: [],
         Monto: '',
         Estado: 'Pendiente',
         FechaPago: '',
@@ -25,7 +25,6 @@ const Cuotas = () => {
         fetchUsuarios();
     }, []);
 
-    // Fetch cuotas from the backend
     const fetchCuotas = async () => {
         try {
             const response = await axios.get(`${baseUrlCuotas}?action=fetch`);
@@ -42,7 +41,6 @@ const Cuotas = () => {
         }
     };
 
-    // Fetch usuarios from the backend
     const fetchUsuarios = async () => {
         try {
             const response = await axios.get(`${baseUrlUsuarios}?action=fetch`);
@@ -57,23 +55,30 @@ const Cuotas = () => {
     };
 
     const handleCreateCuota = async () => {
-        if (!newCuota.IdUsuario || !newCuota.Monto) {
-            alert('Por favor, selecciona un usuario y completa el monto.');
+        const { IdUsuarios, Monto } = newCuota;
+
+        if (!IdUsuarios.length || !Monto) {
+            alert('Por favor, selecciona al menos un usuario y completa el monto.');
+            return;
+        }
+
+        if (!/^\d+$/.test(Monto) || parseInt(Monto, 10) <= 0) {
+            alert('El monto debe ser un número entero positivo.');
             return;
         }
 
         try {
-            const response = await axios.post(`${baseUrlCuotas}?action=create`, newCuota);
+            const response = await axios.post(`${baseUrlCuotas}?action=create`, { ...newCuota });
             if (response.data.status === 'success') {
-                alert('Cuota creada exitosamente');
+                alert('Cuotas creadas exitosamente');
                 setShowCreateModal(false);
-                setNewCuota({ IdUsuario: '', Monto: '', Estado: 'Pendiente', FechaPago: '' });
+                setNewCuota({ IdUsuarios: [], Monto: '', Estado: 'Pendiente', FechaPago: '' });
                 fetchCuotas();
             } else {
-                console.error('Error al crear cuota:', response.data.message);
+                console.error('Error al crear cuotas:', response.data.message);
             }
         } catch (error) {
-            console.error('Error al crear cuota:', error.message);
+            console.error('Error al crear cuotas:', error.message);
         }
     };
 
@@ -148,7 +153,12 @@ const Cuotas = () => {
                                 {userRole === 'Tesorero' ? (
                                     <select
                                         value={cuota.Estado}
-                                        onChange={(e) => handleUpdateEstadoCuota(cuota.Id, e.target.value)}
+                                        onChange={(e) => {
+                                            handleUpdateEstadoCuota(cuota.Id, e.target.value);
+                                            if (e.target.value === 'Pendiente') {
+                                                handleUpdateFechaPago(cuota.Id, '----/--/--');
+                                            }
+                                        }}
                                     >
                                         <option value="Pendiente">Pendiente</option>
                                         <option value="Pagada">Pagada</option>
@@ -165,7 +175,7 @@ const Cuotas = () => {
                                         onChange={(e) => handleUpdateFechaPago(cuota.Id, e.target.value)}
                                     />
                                 ) : (
-                                    cuota.FechaPago || 'No registrada'
+                                    cuota.Estado === 'Pendiente' ? '----/--/--' : cuota.FechaPago || 'No registrada'
                                 )}
                             </td>
                             <td>
@@ -186,41 +196,37 @@ const Cuotas = () => {
 
             <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Crear Cuota</Modal.Title>
+                    <Modal.Title>Crear Cuotas</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="create-form">
+                        <label>Seleccionar Usuarios:</label>
                         <select
-                            value={newCuota.IdUsuario}
-                            onChange={(e) => setNewCuota({ ...newCuota, IdUsuario: e.target.value })}
+                            multiple
+                            value={newCuota.IdUsuarios}
+                            onChange={(e) =>
+                                setNewCuota({
+                                    ...newCuota,
+                                    IdUsuarios: Array.from(e.target.selectedOptions, (option) => option.value),
+                                })
+                            }
                         >
-                            <option value="">Seleccionar Usuario</option>
-                            {usuarios.length > 0 ? (
-                                usuarios.map((usuario) => (
-                                    <option key={usuario.Id} value={usuario.Id}>
-                                        {usuario.Nombre} - {usuario.Correo}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="">No hay usuarios disponibles</option>
-                            )}
+                            {usuarios.map((usuario) => (
+                                <option key={usuario.Id} value={usuario.Id}>
+                                    {usuario.Nombre}
+                                </option>
+                            ))}
                         </select>
+                        <label>Monto:</label>
                         <input
                             type="number"
                             placeholder="Monto"
                             value={newCuota.Monto}
                             onChange={(e) => setNewCuota({ ...newCuota, Monto: e.target.value })}
                         />
-                        <select
-                            value={newCuota.Estado}
-                            onChange={(e) => setNewCuota({ ...newCuota, Estado: e.target.value })}
-                        >
-                            <option value="Pendiente">Pendiente</option>
-                            <option value="Pagada">Pagada</option>
-                        </select>
+                        <label>Fecha de Pago (opcional):</label>
                         <input
                             type="date"
-                            placeholder="Fecha de Pago"
                             value={newCuota.FechaPago}
                             onChange={(e) => setNewCuota({ ...newCuota, FechaPago: e.target.value })}
                         />

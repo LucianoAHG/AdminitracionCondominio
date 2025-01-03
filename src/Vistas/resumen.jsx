@@ -3,7 +3,7 @@ import '../CSS/Resumen.css';
 import axios from 'axios';
 
 const Resumen = () => {
-    const [cuotas, setCuotas] = useState({ pagadas: 0, pendientes: 0 });
+    const [cuotas, setCuotas] = useState({ pagadas: 0, pendientes: 0, totalAcumulado: 0 });
     const [actasRecientes, setActasRecientes] = useState([]);
 
     const fetchResumen = async () => {
@@ -13,6 +13,7 @@ const Resumen = () => {
                 setCuotas({
                     pagadas: response.data.data.cuotas.pagadas,
                     pendientes: response.data.data.cuotas.pendientes,
+                    totalAcumulado: response.data.data.cuotas.totalAcumulado,
                 });
                 setActasRecientes(response.data.data.actas);
             } else {
@@ -51,6 +52,12 @@ const Resumen = () => {
                 <div className="resumen-stat-item">
                     <p className="resumen-stat-title">Cuotas Pendientes</p>
                     <p className="resumen-stat-value">{cuotas.pendientes}</p>
+                </div>
+                <div className="resumen-stat-item">
+                    <p className="resumen-stat-title">Total Acumulado</p>
+                    <p className="resumen-stat-value">
+                        ${parseFloat(cuotas.totalAcumulado).toLocaleString('es-CL')}
+                    </p>
                 </div>
             </div>
 
