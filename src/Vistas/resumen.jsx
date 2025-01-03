@@ -3,21 +3,48 @@ import '../CSS/Resumen.css';
 import axios from 'axios';
 
 const Resumen = () => {
-    const [cuotas, setCuotas] = useState({ pagadas: 0, pendientes: 0, totalAcumulado: 0 });
+    const [cuotas, setCuotas] = useState({
+        pagadas: 0,
+        pendientes: 0,
+        totalAcumulado: 0,
+        totalPorPagar: 0, // Total por pagar para cuotas pendientes
+    });
     const [actasRecientes, setActasRecientes] = useState([]);
 
     const fetchResumen = async () => {
         try {
-            const response = await axios.get('https://elias.go.miorganizacion.cl/api/resumen.php');
-            if (response.data.status === 'success') {
+            // Obtener las cuotas
+            const cuotasResponse = await axios.get('https://elias.go.miorganizacion.cl/api/cuotas.php?action=fetch');
+            if (cuotasResponse.data.status === 'success') {
+                const cuotasData = cuotasResponse.data.data;
+
+                // Calcular el total por pagar basado en cuotas pendientes
+                const totalPorPagar = cuotasData
+                    .filter((cuota) => cuota.Estado === 'Pendiente')
+                    .reduce((total, cuota) => total + parseFloat(cuota.Monto || 0), 0);
+
                 setCuotas({
-                    pagadas: response.data.data.cuotas.pagadas,
-                    pendientes: response.data.data.cuotas.pendientes,
-                    totalAcumulado: response.data.data.cuotas.totalAcumulado,
+                    pagadas: cuotasData.filter((cuota) => cuota.Estado === 'Pagada').length,
+                    pendientes: cuotasData.filter((cuota) => cuota.Estado === 'Pendiente').length,
+                    totalAcumulado: cuotasData.reduce((total, cuota) => total + parseFloat(cuota.Monto || 0), 0),
+                    totalPorPagar, // Asignar el total calculado
                 });
-                setActasRecientes(response.data.data.actas);
             } else {
-                console.error('Error al obtener datos del resumen:', response.data.message);
+                console.error('Error al obtener datos de cuotas:', cuotasResponse.data.message);
+            }
+
+            // Obtener las actas recientes
+            const actasResponse = await axios.get('https://elias.go.miorganizacion.cl/api/actas.php?action=fetch');
+            if (actasResponse.data.status === 'success') {
+                // Asegurarse de que las actas tienen los campos `Titulo` y `Fecha`
+                setActasRecientes(
+                    actasResponse.data.data.map((acta) => ({
+                        Titulo: acta.Detalle || 'Sin título',
+                        Fecha: acta.Fecha || 'Sin fecha',
+                    }))
+                );
+            } else {
+                console.error('Error al obtener las actas recientes:', actasResponse.data.message);
             }
         } catch (error) {
             console.error('Error al obtener datos del resumen:', error.message);
@@ -55,8 +82,14 @@ const Resumen = () => {
                 </div>
                 <div className="resumen-stat-item">
                     <p className="resumen-stat-title">Total Acumulado</p>
-                    <p className="resumen-stat-value">
+                    <p className="resumen-stat-value" style={{ color: 'green' }}>
                         ${parseFloat(cuotas.totalAcumulado).toLocaleString('es-CL')}
+                    </p>
+                </div>
+                <div className="resumen-stat-item">
+                    <p className="resumen-stat-title">Total por Pagar</p>
+                    <p className="resumen-stat-value" style={{ color: 'red' }}>
+                        ${parseFloat(cuotas.totalPorPagar).toLocaleString('es-CL')}
                     </p>
                 </div>
             </div>
@@ -65,9 +98,9 @@ const Resumen = () => {
                 <div id="resumen-recent-acts">
                     <h2 className="resumen-section-title">Actas Recientes</h2>
                     <ul className="resumen-list">
-                        {actasRecientes.map((acta) => (
-                            <li key={`acta-${acta.id}`} className="resumen-list-item">
-                                <strong>{acta.titulo}</strong> - {acta.fecha}
+                        {actasRecientes.map((acta, index) => (
+                            <li key={`acta-${index}`} className="resumen-list-item">
+                                <strong>{acta.Titulo}</strong> - {acta.Fecha}
                             </li>
                         ))}
                     </ul>

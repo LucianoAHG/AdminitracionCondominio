@@ -3,16 +3,16 @@ import {
     FaUserCircle, FaMoneyBill, FaClipboard, FaBalanceScale, FaUsers, FaFileAlt, FaSignOutAlt, FaUser
 } from 'react-icons/fa'; // Ejemplo de iconos
 import '../CSS/MainMenu.css';
-import IngresosEgresos from './IngresosEgresos.jsx';
-import Cuotas from '/src/Vistas/Cuotas.jsx';
+import Resumen from '/src/Vistas/resumen.jsx';
 import Actas from '/src/Vistas/Actas.jsx';
+import Cuotas from '/src/Vistas/Cuotas.jsx';
+import IngresosEgresos from './IngresosEgresos.jsx';
 import Organizacion from '/src/Vistas/Organizacion.jsx';
 import RegistroAuditoria from '/src/Vistas/RegistroAuditoria.jsx';
 import Usuarios from '/src/Vistas/Usuarios.jsx';
-import Resumen from '/src/Vistas/resumen.jsx';
 
 const MainMenu = () => {
-    const [selectedMenu, setSelectedMenu] = useState('Cuota');
+    const [selectedMenu, setSelectedMenu] = useState('Inicio');
     const [showLogout, setShowLogout] = useState(false);
 
     // Recuperar datos del usuario desde localStorage
@@ -20,13 +20,13 @@ const MainMenu = () => {
     const userRole = localStorage.getItem('userRole') || 'Rol Usuario';
 
     const menuItems = [
+        { label: 'Inicio', icon: <FaUser />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Usuario'] },
         { label: 'Acta', icon: <FaClipboard />, roles: ['Administrador', 'Presidente', 'Secretario', 'Usuario'] },
         { label: 'Cuota', icon: <FaMoneyBill />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Usuario'] },
         { label: 'Ingresos/Egresos', icon: <FaBalanceScale />, roles: ['Administrador', 'Presidente', 'Tesorero'] },
         { label: 'Organización (Composición Comité)', icon: <FaUsers />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Usuario'] },
         { label: 'Registro Auditoría', icon: <FaFileAlt />, roles: ['Administrador', 'Presidente', ] },
         { label: 'Usuarios', icon: <FaUser />, roles: ['Administrador', 'Presidente', ] },
-        { label: 'Resumen', icon: <FaUser />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Usuario'] }
     ];
 
     // Filtrar elementos del menú según el rol del usuario
@@ -34,10 +34,12 @@ const MainMenu = () => {
 
     const renderContent = () => {
         switch (selectedMenu) {
-            case 'Cuota':
-                return <Cuotas />;
+            case 'Inicio':
+                return <Resumen />;
             case 'Acta':
                 return <Actas />;
+            case 'Cuota':
+                return <Cuotas />;
             case 'Ingresos/Egresos':
                 return <IngresosEgresos />;
             case 'Organización (Composición Comité)':
@@ -46,8 +48,6 @@ const MainMenu = () => {
                 return <RegistroAuditoria />;
             case 'Usuarios':
                 return <Usuarios />;
-            case 'Resumen':
-                return <Resumen />;
             default:
                 return <div>Seleccione una opción del menú</div>;
         }
