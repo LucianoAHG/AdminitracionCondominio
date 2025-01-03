@@ -14,7 +14,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'login') {
         exit;
     }
 
-    // Consulta SQL con JOIN para incluir el nombre del rol
+    // Consulta SQL para obtener el usuario con su rol
     $query = "
         SELECT Usuarios.Id, Usuarios.Nombre, Usuarios.Password, Roles.Nombre AS Rol
         FROM Usuarios
@@ -35,8 +35,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'login') {
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
 
-            // Validar la contraseña
-            if ($password === $user['Password']) { // Comparación directa (sin cifrado)
+            // Validar la contraseña usando password_verify
+            if (password_verify($password, $user['Password'])) {
                 echo json_encode([
                     'status' => 'success',
                     'data' => [
@@ -54,6 +54,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'login') {
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Error al ejecutar la consulta.']);
     }
+    $stmt->close();
+    $conn->close();
     exit;
 }
 ?>

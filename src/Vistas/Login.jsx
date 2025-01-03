@@ -34,11 +34,8 @@ const Login = () => {
                 }
             );
 
-            console.log('Respuesta del servidor:', response);
-
             if (response.data && response.data.status === 'success') {
                 const user = response.data.data;
-                console.log('Usuario autenticado:', user);
 
                 // Almacenar datos básicos en localStorage
                 localStorage.setItem('userId', user.Id);

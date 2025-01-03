@@ -52,58 +52,33 @@ const Usuarios = () => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        if (isEditing) {
-            await handleUpdateUsuario();
-        } else {
-            await handleCreateUsuario();
+        if (!formData.usuarioRol) {
+            alert('Por favor, selecciona un rol.');
+            return;
         }
-        setShowModal(false);
-    };
 
-    const handleCreateUsuario = async () => {
         try {
-            await axios.post(baseUrlUsuarios, {
+            const actionUrl = `${baseUrlUsuarios}?action=${isEditing ? 'update' : 'create'}`;
+            const payload = {
                 Nombre: formData.usuarioNombre,
                 Correo: formData.usuarioCorreo,
                 Telefono: formData.usuarioTelefono,
                 Password: formData.usuarioPassword,
                 IdRol: formData.usuarioRol
-            });
-            alert('Usuario creado con éxito');
-            fetchUsuarios();
-            resetForm();
-        } catch (error) {
-            console.error('Error al crear usuario:', error);
-        }
-    };
+            };
 
-    const handleUpdateUsuario = async () => {
-        try {
-            await axios.put(baseUrlUsuarios, {
-                Id: editId,
-                Nombre: formData.usuarioNombre,
-                Correo: formData.usuarioCorreo,
-                Telefono: formData.usuarioTelefono,
-                Password: formData.usuarioPassword,
-                IdRol: formData.usuarioRol
-            });
-            alert('Usuario actualizado con éxito');
-            fetchUsuarios();
-            resetForm();
-        } catch (error) {
-            console.error('Error al actualizar usuario:', error);
-        }
-    };
-
-    const handleDeleteUsuario = async (id) => {
-        if (window.confirm('¿Estás seguro de eliminar este usuario?')) {
-            try {
-                await axios.delete(baseUrlUsuarios, { data: { Id: id } });
-                alert('Usuario eliminado con éxito');
+            const response = await axios.post(actionUrl, payload);
+            if (response.data.status === 'success') {
+                alert(isEditing ? 'Usuario actualizado con éxito' : 'Usuario creado con éxito');
                 fetchUsuarios();
-            } catch (error) {
-                console.error('Error al eliminar usuario:', error);
+                resetForm();
+                setShowModal(false);
+            } else {
+                alert(response.data.message || 'No se pudo guardar el usuario.');
             }
+        } catch (error) {
+            console.error('Error al guardar usuario:', error);
+            alert('Error al conectar con el servidor.');
         }
     };
 
@@ -112,12 +87,33 @@ const Usuarios = () => {
             usuarioNombre: usuario?.Nombre || '',
             usuarioCorreo: usuario?.Correo || '',
             usuarioTelefono: usuario?.Telefono || '',
-            usuarioPassword: '',
+            usuarioPassword: '', // La contraseña no se muestra ni se edita directamente.
             usuarioRol: roles.find((rol) => rol.Nombre === usuario?.RolNombre)?.Id || ''
         });
         setEditId(usuario?.Id);
         setIsEditing(true);
         setShowModal(true);
+    };
+
+    const handleDeleteUsuario = async (id) => {
+        if (window.confirm('¿Estás seguro de eliminar este usuario?')) {
+            try {
+                const response = await axios.delete(baseUrlUsuarios, {
+                    headers: { 'Content-Type': 'application/json' },
+                    data: { Id: id },
+                });
+
+                if (response.data.status === 'success') {
+                    alert('Usuario eliminado con éxito');
+                    fetchUsuarios();
+                } else {
+                    alert(response.data.message || 'No se pudo eliminar el usuario.');
+                }
+            } catch (error) {
+                console.error('Error al eliminar usuario:', error);
+                alert('Error al conectar con el servidor.');
+            }
+        }
     };
 
     const resetForm = () => {

@@ -1,31 +1,54 @@
 <?php
-header("Content-Type: application/json");
+require_once 'db.php';
 
-include_once 'db.php';
+header('Content-Type: application/json; charset=utf-8');
 
-$method = $_SERVER['REQUEST_METHOD'];
+// Permitir CORS
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-switch ($method) {
-    case 'GET':
-        $sql = "SELECT * FROM Roles";
-        $result = $conn->query($sql);
-        $roles = $result->fetch_all(MYSQLI_ASSOC);
-        echo json_encode($roles);
-        break;
+try {
+    // Consultar los roles
+    $query = "SELECT Id, Nombre FROM Roles";
+    $stmt = $conn->prepare($query);
 
-    case 'POST':
-        $data = json_decode(file_get_contents("php://input"), true);
-        $sql = "INSERT INTO Roles (Nombre) VALUES (?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $data['Nombre']);
-        $stmt->execute();
-        echo json_encode(['message' => 'Rol creado']);
-        break;
+    if (!$stmt) {
+        throw new Exception('Error al preparar la consulta: ' . $conn->error);
+    }
 
-    default:
-        http_response_code(405);
-        echo json_encode(['message' => 'Método no permitido']);
-        break;
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if (!$result) {
+        throw new Exception('Error al ejecutar la consulta: ' . $stmt->error);
+    }
+
+    $roles = [];
+    while ($row = $result->fetch_assoc()) {
+        $roles[] = [
+            'Id' => $row['Id'],
+            'Nombre' => $row['Nombre']
+        ];
+    }
+
+    // Responder con los roles en formato JSON
+    echo json_encode([
+        'status' => 'success',
+        'data' => $roles
+    ]);
+} catch (Exception $e) {
+    // Capturar y devolver errores
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Error al obtener roles: ' . $e->getMessage()
+    ]);
+} finally {
+    if (isset($stmt)) {
+        $stmt->close();
+    }
+    if (isset($conn)) {
+        $conn->close();
+    }
 }
-$conn->close();
 ?>
