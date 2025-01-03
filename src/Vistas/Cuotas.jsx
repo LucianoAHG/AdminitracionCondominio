@@ -18,7 +18,7 @@ const Cuotas = () => {
     const baseUrlUsuarios = 'https://elias.go.miorganizacion.cl/api/usuarios.php';
 
     const userRole = localStorage.getItem('userRole') || 'Rol Usuario';
-    const userId = localStorage.getItem('userId'); // Suponiendo que el ID de usuario se guarda en localStorage
+    const userId = localStorage.getItem('userId');
 
     useEffect(() => {
         fetchCuotas();
@@ -30,16 +30,12 @@ const Cuotas = () => {
         try {
             const response = await axios.get(`${baseUrlCuotas}?action=fetch`);
             if (response.data.status === 'success') {
-                if (userRole === 'Usuario') {
-                    // Filtrar solo las cuotas del usuario actual
-                    setCuotas(response.data.data.filter(cuota => cuota.IdUsuario === userId));
-                } else {
-                    // Mostrar todas las cuotas si el usuario tiene roles superiores
-                    setCuotas(response.data.data || []);
-                }
+                const filteredCuotas = userRole === 'Usuario'
+                    ? response.data.data.filter((cuota) => cuota.IdUsuario === userId)
+                    : response.data.data;
+                setCuotas(filteredCuotas);
             } else {
                 console.error('Error al obtener cuotas:', response.data.message);
-                setCuotas([]);
             }
         } catch (error) {
             console.error('Error al obtener cuotas:', error.message);
@@ -54,11 +50,9 @@ const Cuotas = () => {
                 setUsuarios(response.data.data || []);
             } else {
                 console.error('Error al obtener usuarios:', response.data.message);
-                setUsuarios([]);
             }
         } catch (error) {
             console.error('Error al obtener usuarios:', error.message);
-            setUsuarios([]);
         }
     };
 
@@ -106,14 +100,13 @@ const Cuotas = () => {
                 alert('Estado de la cuota actualizado');
                 fetchCuotas();
             } else {
-                console.error('Error al actualizar el estado de la cuota:', response.data.message);
+                console.error('Error al actualizar estado:', response.data.message);
             }
         } catch (error) {
-            console.error('Error al actualizar el estado de la cuota:', error.message);
+            console.error('Error al actualizar estado:', error.message);
         }
     };
 
-    // Actualizar fecha de pago de la cuota
     const handleUpdateFechaPago = async (id, newFechaPago) => {
         try {
             const response = await axios.get(`${baseUrlCuotas}?action=updateFechaPago&id=${id}&fechaPago=${newFechaPago}`);
@@ -121,10 +114,10 @@ const Cuotas = () => {
                 alert('Fecha de pago actualizada');
                 fetchCuotas();
             } else {
-                console.error('Error al actualizar la fecha de pago:', response.data.message);
+                console.error('Error al actualizar fecha de pago:', response.data.message);
             }
         } catch (error) {
-            console.error('Error al actualizar la fecha de pago:', error.message);
+            console.error('Error al actualizar fecha de pago:', error.message);
         }
     };
 
