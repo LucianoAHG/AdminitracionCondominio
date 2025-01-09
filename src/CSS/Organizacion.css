@@ -20,14 +20,14 @@ h2 {
     justify-content: center; /* Centra las tarjetas horizontalmente */
 }
 
-/* Estilización de las Tarjetas */
+/* Estilizaciï¿½n de las Tarjetas */
 .organizacion-card {
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 1.5rem;
-    flex: 1 1 calc(33.33% - 1rem); /* Tres tarjetas por fila como máximo */
-    max-width: 350px; /* Tamaño máximo para mantenerlas uniformes */
+    flex: 1 1 calc(33.33% - 1rem); /* Tres tarjetas por fila como mï¿½ximo */
+    max-width: 350px; /* Tamaï¿½o mï¿½ximo para mantenerlas uniformes */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -42,7 +42,7 @@ h2 {
         box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
     }
 
-    /* Colores específicos por rol */
+    /* Colores especï¿½ficos por rol */
     .organizacion-card.presidente {
         border-left-color: #007bff;
     }
@@ -53,6 +53,9 @@ h2 {
 
     .organizacion-card.tesorero {
         border-left-color: #ffc107;
+    }
+    .organizacion-card.socio {
+        border-left-color: #00eeff;
     }
 
 /* Contenido de las Tarjetas */
@@ -97,7 +100,7 @@ h2 {
     margin-right: 0.5rem;
 }
 
-/* Botones de Acción */
+/* Botones de Acciï¿½n */
 .card-actions {
     margin-top: 1rem;
     display: flex;

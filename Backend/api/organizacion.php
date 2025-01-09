@@ -17,7 +17,7 @@ switch ($method) {
                 FROM Organizacion o
                 INNER JOIN Usuarios u ON o.IdUsuario = u.Id
                 INNER JOIN Roles r ON o.IdRol = r.Id
-                WHERE r.Nombre IN ('Presidente', 'Secretario', 'Tesorero')";
+                WHERE r.Nombre IN ('Presidente', 'Secretario', 'Tesorero', 'Socio')";
         $result = $conn->query($sql);
 
         $organizaciones = $result->fetch_all(MYSQLI_ASSOC);
