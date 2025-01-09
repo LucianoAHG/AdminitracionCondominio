@@ -5,6 +5,7 @@ import '../CSS/Actas.css';
 
 const Actas = () => {
     const [actas, setActas] = useState([]);
+    const [usuarios, setUsuarios] = useState([]);
     const [search, setSearch] = useState('');
     const [filteredActas, setFilteredActas] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -14,23 +15,23 @@ const Actas = () => {
         Detalle: '',
         Acuerdo: '',
         Invitados: '',
+        IdUsuarios: [], // Aquí se almacenan los nombres seleccionados
     });
 
-    // Verificar si el usuario tiene permiso para realizar estas acciones
     const userRole = localStorage.getItem('userRole') || 'Rol Usuario';
-
-    // Los roles que pueden gestionar actas
     const canManageActas = ['Administrador', 'Secretario', 'Presidente'].includes(userRole);
 
-    const baseUrl = 'https://elias.go.miorganizacion.cl/api/actas.php';
+    const baseUrlActas = 'https://elias.go.miorganizacion.cl/api/actas.php';
+    const baseUrlUsuarios = 'https://elias.go.miorganizacion.cl/api/usuarios.php';
 
     useEffect(() => {
         fetchActas();
+        fetchUsuarios();
     }, []);
 
     const fetchActas = async () => {
         try {
-            const response = await axios.get(baseUrl);
+            const response = await axios.get(baseUrlActas);
             if (response.data.status === 'success' && Array.isArray(response.data.data)) {
                 setActas(response.data.data);
                 setFilteredActas(response.data.data);
@@ -40,6 +41,19 @@ const Actas = () => {
             }
         } catch (error) {
             console.error('Error al obtener las actas:', error.message);
+        }
+    };
+
+    const fetchUsuarios = async () => {
+        try {
+            const response = await axios.get(`${baseUrlUsuarios}?action=fetch`);
+            if (response.data.status === 'success') {
+                setUsuarios(response.data.data || []);
+            } else {
+                console.error('Error al obtener usuarios:', response.data.message);
+            }
+        } catch (error) {
+            console.error('Error al obtener usuarios:', error.message);
         }
     };
 
@@ -57,13 +71,29 @@ const Actas = () => {
 
     const handleCreateActa = async () => {
         if (!canManageActas) return;
+
+        const actaData = {
+            ...newActa,
+            Invitados: newActa.Invitados.trim(),
+            Socios: newActa.IdUsuarios.join(', '), // Convertir nombres seleccionados a texto separado por comas
+        };
+
         try {
-            const response = await axios.post(baseUrl, newActa);
+            const response = await axios.post(baseUrlActas, actaData);
             if (response.data.status === 'success') {
                 alert('Acta creada con éxito');
                 setShowCreateModal(false);
-                setNewActa({ Fecha: '', Numero: '', Detalle: '', Acuerdo: '', Invitados: '' });
+                setNewActa({
+                    Fecha: '',
+                    Numero: '',
+                    Detalle: '',
+                    Acuerdo: '',
+                    Invitados: '',
+                    IdUsuarios: [],
+                });
                 fetchActas();
+            } else {
+                console.error('Error en la respuesta del servidor:', response.data.message);
             }
         } catch (error) {
             console.error('Error al crear el acta:', error.message);
@@ -73,10 +103,12 @@ const Actas = () => {
     const handleDeleteActa = async (id) => {
         if (!canManageActas || !window.confirm('¿Estás seguro de que deseas eliminar esta acta?')) return;
         try {
-            const response = await axios.delete(`${baseUrl}?id=${id}`);
+            const response = await axios.delete(`${baseUrlActas}?id=${id}`);
             if (response.data.status === 'success') {
                 alert('Acta eliminada con éxito');
                 fetchActas();
+            } else {
+                console.error('Error en la respuesta del servidor:', response.data.message);
             }
         } catch (error) {
             console.error('Error al eliminar el acta:', error.message);
@@ -105,6 +137,7 @@ const Actas = () => {
                         <th>Número</th>
                         <th>Detalle</th>
                         <th>Acuerdo</th>
+                        <th>Socios</th>
                         <th>Invitados</th>
                         <th>Acciones</th>
                     </tr>
@@ -116,6 +149,7 @@ const Actas = () => {
                             <td>{acta.Numero || 'No registrado'}</td>
                             <td>{acta.Detalle || 'No registrado'}</td>
                             <td>{acta.Acuerdo || 'No registrado'}</td>
+                            <td>{acta.Socios || 'Sin socios asociados'}</td>
                             <td>{acta.Invitados || 'No registrados'}</td>
                             <td>
                                 {canManageActas && (
@@ -139,30 +173,46 @@ const Actas = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="create-form">
+                        <label>Fecha:</label>
                         <input
                             type="date"
-                            placeholder="Fecha"
                             value={newActa.Fecha}
                             onChange={(e) => setNewActa({ ...newActa, Fecha: e.target.value })}
                         />
+                        <label>Número:</label>
                         <input
                             type="number"
-                            placeholder="Número"
                             value={newActa.Numero}
                             onChange={(e) => setNewActa({ ...newActa, Numero: e.target.value })}
                         />
+                        <label>Detalle:</label>
                         <textarea
-                            placeholder="Detalle"
                             value={newActa.Detalle}
                             onChange={(e) => setNewActa({ ...newActa, Detalle: e.target.value })}
                         />
+                        <label>Acuerdo:</label>
                         <textarea
-                            placeholder="Acuerdo"
                             value={newActa.Acuerdo}
                             onChange={(e) => setNewActa({ ...newActa, Acuerdo: e.target.value })}
                         />
+                        <label>Seleccionar Usuarios:</label>
+                        <select
+                            multiple
+                            value={newActa.IdUsuarios}
+                            onChange={(e) => {
+                                const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.text);
+                                setNewActa({ ...newActa, IdUsuarios: selectedOptions });
+                            }}
+                        >
+                            {usuarios.map((usuario) => (
+                                <option key={usuario.Id} value={usuario.Nombre}>
+                                    {usuario.Nombre}
+                                </option>
+                            ))}
+                        </select>
+                        <label>Invitados:</label>
                         <textarea
-                            placeholder="Invitados"
+                            placeholder="Invitados manuales"
                             value={newActa.Invitados}
                             onChange={(e) => setNewActa({ ...newActa, Invitados: e.target.value })}
                         />

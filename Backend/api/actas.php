@@ -1,10 +1,10 @@
 <?php
-// Conexi¨®n a la base de datos
+// ConexiÃ³n a la base de datos
 require_once 'db.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-// Verificar el m¨¦todo HTTP
+// Verificar el mÃ©todo HTTP
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
@@ -32,22 +32,15 @@ if ($method === 'GET') {
                 'Numero' => $row['Numero'],
                 'Detalle' => $row['Detalle'],
                 'Acuerdo' => $row['Acuerdo'],
-                'Invitados' => $row['Invitados']
+                'Invitados' => $row['Invitados'],
+                'Socios' => $row['Socios'], // AÃ±adir socios al JSON
             ];
         }
 
-        if (count($actas) > 0) {
-            echo json_encode([
-                "status" => "success",
-                "data" => $actas
-            ]);
-        } else {
-            echo json_encode([
-                "status" => "success",
-                "data" => [],
-                "message" => "No hay actas disponibles"
-            ]);
-        }
+        echo json_encode([
+            "status" => "success",
+            "data" => $actas
+        ]);
     } catch (Exception $e) {
         echo json_encode([
             "status" => "error",
@@ -64,10 +57,15 @@ if ($method === 'GET') {
             isset($data['Numero']) &&
             isset($data['Detalle']) &&
             isset($data['Acuerdo']) &&
-            isset($data['Invitados'])
+            isset($data['Invitados']) &&
+            isset($data['Socios']) // Verificar que el campo Socios estÃ© presente
         ) {
-            $query = "INSERT INTO Actas (Fecha, Numero, Detalle, Acuerdo, Invitados) 
-                      VALUES (?, ?, ?, ?, ?)";
+            // Convertir el array de IDs de socios en un string separado por comas
+            $socios = is_array($data['Socios']) ? implode(',', array_map('intval', $data['Socios'])) : '';
+
+            // Consulta para insertar los datos en la tabla Actas
+            $query = "INSERT INTO Actas (Fecha, Numero, Detalle, Acuerdo, Invitados, Socios) 
+                      VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
 
             if (!$stmt) {
@@ -79,12 +77,13 @@ if ($method === 'GET') {
             }
 
             $stmt->bind_param(
-                "sssss",
+                "ssssss",
                 $data['Fecha'],
                 $data['Numero'],
                 $data['Detalle'],
                 $data['Acuerdo'],
-                $data['Invitados']
+                $data['Invitados'],
+                $socios // Guardar los IDs de socios como un string separado por comas
             );
 
             if ($stmt->execute()) {
@@ -104,7 +103,7 @@ if ($method === 'GET') {
         } else {
             echo json_encode([
                 "status" => "error",
-                "message" => "Todos los campos son obligatorios: Fecha, Numero, Detalle, Acuerdo, Invitados"
+                "message" => "Todos los campos son obligatorios: Fecha, Numero, Detalle, Acuerdo, Invitados, Socios"
             ]);
         }
     } catch (Exception $e) {
@@ -116,11 +115,9 @@ if ($method === 'GET') {
 } elseif ($method === 'DELETE') {
     // Manejo de solicitudes DELETE
     try {
-        // Obtener el ID de la acta a eliminar desde la URL
         if (isset($_GET['id'])) {
             $id = intval($_GET['id']);
 
-            // Preparar la consulta para eliminar la acta
             $query = "DELETE FROM Actas WHERE Id = ?";
             $stmt = $conn->prepare($query);
 
@@ -134,7 +131,6 @@ if ($method === 'GET') {
 
             $stmt->bind_param("i", $id);
 
-            // Ejecutar la consulta
             if ($stmt->execute()) {
                 if ($stmt->affected_rows > 0) {
                     echo json_encode([
@@ -144,13 +140,13 @@ if ($method === 'GET') {
                 } else {
                     echo json_encode([
                         "status" => "error",
-                        "message" => "No se encontr¨® un acta con el ID especificado"
+                        "message" => "No se encontrÃ³ un acta con el ID especificado"
                     ]);
                 }
             } else {
                 echo json_encode([
                     "status" => "error",
-                    "message" => "Error al eliminar la acta: " . $stmt->error
+                    "message" => "Error al eliminar el acta: " . $stmt->error
                 ]);
             }
 
@@ -158,7 +154,7 @@ if ($method === 'GET') {
         } else {
             echo json_encode([
                 "status" => "error",
-                "message" => "El par¨¢metro 'id' es obligatorio para eliminar un acta"
+                "message" => "El parÃ¡metro 'id' es obligatorio para eliminar un acta"
             ]);
         }
     } catch (Exception $e) {
@@ -168,10 +164,9 @@ if ($method === 'GET') {
         ]);
     }
 } else {
-    // Manejo de m¨¦todos no permitidos
     echo json_encode([
         "status" => "error",
-        "message" => "M¨¦todo no permitido"
+        "message" => "MÃ©todo no permitido"
     ]);
 }
 ?>
