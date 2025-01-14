@@ -10,7 +10,13 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     // Manejo de solicitudes GET
     try {
-        $query = "SELECT * FROM Actas";
+        $query = "
+            SELECT a.*, 
+                   (SELECT GROUP_CONCAT(u.Nombre SEPARATOR ', ') 
+                    FROM Usuarios u 
+                    WHERE FIND_IN_SET(u.Id, a.Socios)) AS NombresSocios
+            FROM Actas a";
+
         $stmt = $conn->prepare($query);
 
         if (!$stmt) {
@@ -33,7 +39,7 @@ if ($method === 'GET') {
                 'Detalle' => $row['Detalle'],
                 'Acuerdo' => $row['Acuerdo'],
                 'Invitados' => $row['Invitados'],
-                'Socios' => $row['Socios'], // Añadir socios al JSON
+                'Socios' => $row['NombresSocios'] ?? 'Sin socios asociados', // Mostrar nombres de socios
             ];
         }
 

@@ -15,7 +15,7 @@ const Actas = () => {
         Detalle: '',
         Acuerdo: '',
         Invitados: '',
-        IdUsuarios: [], // Aquí se almacenan los nombres seleccionados
+        IdUsuarios: [],
     });
 
     const userRole = localStorage.getItem('userRole') || 'Rol Usuario';
@@ -75,7 +75,7 @@ const Actas = () => {
         const actaData = {
             ...newActa,
             Invitados: newActa.Invitados.trim(),
-            Socios: newActa.IdUsuarios.join(', '), // Convertir nombres seleccionados a texto separado por comas
+            Socios: newActa.IdUsuarios, // Enviar los IDs seleccionados
         };
 
         try {
@@ -149,7 +149,7 @@ const Actas = () => {
                             <td>{acta.Numero || 'No registrado'}</td>
                             <td>{acta.Detalle || 'No registrado'}</td>
                             <td>{acta.Acuerdo || 'No registrado'}</td>
-                            <td>{acta.Socios || 'Sin socios asociados'}</td>
+                            <td>{acta.Socios || 'Sin socios asociados'}</td> {/* Mostrar nombres de socios */}
                             <td>{acta.Invitados || 'No registrados'}</td>
                             <td>
                                 {canManageActas && (
@@ -200,12 +200,12 @@ const Actas = () => {
                             multiple
                             value={newActa.IdUsuarios}
                             onChange={(e) => {
-                                const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.text);
-                                setNewActa({ ...newActa, IdUsuarios: selectedOptions });
+                                const selectedIds = Array.from(e.target.selectedOptions, (option) => option.value);
+                                setNewActa({ ...newActa, IdUsuarios: selectedIds });
                             }}
                         >
                             {usuarios.map((usuario) => (
-                                <option key={usuario.Id} value={usuario.Nombre}>
+                                <option key={usuario.Id} value={usuario.Id}>
                                     {usuario.Nombre}
                                 </option>
                             ))}
