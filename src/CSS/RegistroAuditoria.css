@@ -1,20 +1,23 @@
 /* Contenedor Principal */
-.registro-auditoria-container {
+#auditoria-container {
     padding: 1rem;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Fondo gris claro */
 }
 
-h2 {
-    color: #ffffff; /* Letras blancas */
+#auditoria-title {
+    color: #333; /* Letras en gris oscuro */
     margin-bottom: 2rem;
     font-size: 1.8rem;
+    font-weight: bold;
 }
 
 /* Barra de Búsqueda */
-.search-bar {
+#auditoria-search-bar {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -22,67 +25,78 @@ h2 {
     margin-bottom: 1.5rem;
 }
 
-.search-input {
+#auditoria-search-input {
     width: 100%;
     max-width: 500px;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-    .search-input:focus {
+    #auditoria-search-input:focus {
         outline: none;
         border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
     }
 
-.search-icon {
+#auditoria-search-icon {
     font-size: 1.5rem;
     color: #007bff;
 }
 
 /* Contenedor de la Tabla */
-.table-wrapper {
+#auditoria-table-wrapper {
     width: 100%;
     overflow-x: auto;
+    border-radius: 5px;
 }
 
 /* Tabla */
-.registro-auditoria-table {
+#auditoria-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     font-size: 1rem;
+    border-radius: 5px;
+    overflow: hidden;
 }
 
-    .registro-auditoria-table th,
-    .registro-auditoria-table td {
+    #auditoria-table th,
+    #auditoria-table td {
         border: 1px solid #ddd;
         text-align: center;
         padding: 0.75rem;
     }
 
-    .registro-auditoria-table th {
+    #auditoria-table th {
         background-color: #007bff; /* Azul fuerte */
-        color: white; /* Texto blanco para contraste */
+        color: white; /* Texto blanco */
         font-weight: bold;
+        text-transform: uppercase;
     }
 
-    .registro-auditoria-table td {
-        color: black; /* Letras blancas */
-        background-color: white; /* Fondo gris oscuro */
+    #auditoria-table td {
+        color: #333; /* Letras en gris oscuro */
+        background-color: #ffffff; /* Fondo blanco */
+    }
+
+    #auditoria-table tr:nth-child(even) {
+        background-color: #f8f9fa; /* Color alternado para filas */
     }
 
 /* Sin Resultados */
-.no-results {
+#auditoria-no-results {
     font-size: 1rem;
-    color: #ffffff; /* Texto blanco */
+    color: #555;
     text-align: center;
+    padding: 1rem;
 }
 
 /* Botón Ver Detalles */
-.view-button {
+#auditoria-view-button {
     background-color: #007bff;
     color: white;
     border: none;
@@ -93,9 +107,97 @@ h2 {
     gap: 0.5rem;
     cursor: pointer;
     font-size: 0.9rem;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-    .view-button:hover {
+    #auditoria-view-button:hover {
         background-color: #0056b3;
     }
+
+    #auditoria-view-button svg {
+        font-size: 1.2rem;
+    }
+
+/* Contenedor de la paginación */
+#auditoria-pagination-container {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Paginación */
+#auditoria-pagination {
+    display: flex;
+    list-style: none;
+    gap: 5px;
+    padding: 0;
+}
+
+    #auditoria-pagination li {
+        display: inline;
+    }
+
+    #auditoria-pagination a {
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        background-color: #007bff;
+        color: white;
+        border-radius: 5px;
+        border: 1px solid transparent;
+        transition: all 0.3s ease-in-out;
+    }
+
+        #auditoria-pagination a:hover {
+            background-color: #0056b3;
+            border-color: #004999;
+        }
+
+    #auditoria-pagination .active a {
+        font-weight: bold;
+        background-color: #0056b3;
+    }
+
+    #auditoria-pagination .disabled a {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+/* Estilos Responsivos */
+@media (max-width: 768px) {
+    #auditoria-table {
+        font-size: 0.9rem;
+    }
+
+    #auditoria-view-button {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    #auditoria-search-input {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #auditoria-table th,
+    #auditoria-table td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    #auditoria-search-bar {
+        flex-direction: column;
+    }
+
+    #auditoria-pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+        #auditoria-pagination a {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+}
