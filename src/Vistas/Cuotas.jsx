@@ -12,7 +12,7 @@ const Cuotas = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 15;
-    
+
     const [newCuota, setNewCuota] = useState({
         IdUsuarios: [],
         Monto: '',

@@ -6,14 +6,16 @@
     margin: 0 auto;
     text-align: center;
     font-family: Arial, sans-serif;
-    background-color: #f0f8ff; /* Fondo azul claro */
+    background-color: #f0f8ff;
+    /* Fondo azul claro */
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     color: #333;
 }
 
 h2 {
-    color: #007bff; /* Azul primario */
+    color: #007bff;
+    /* Azul primario */
     margin-bottom: 1.5rem;
     font-size: 1.8rem;
     font-weight: bold;
@@ -54,7 +56,8 @@ h2 {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 5px;
-    background-color: #ff8800; /* Naranja de acento */
+    background-color: #ff8800;
+    /* Naranja de acento */
     color: white;
     cursor: pointer;
     transition: background 0.3s;
@@ -66,7 +69,8 @@ h2 {
 }
 
 .add-button:hover {
-    background-color: #e67600; /* Naranja más oscuro */
+    background-color: #e67600;
+    /* Naranja más oscuro */
 }
 
 /* Contenedor de la tabla */
@@ -95,14 +99,17 @@ h2 {
 }
 
 .table th {
-    background-color: #007bff; /* Azul fuerte */
-    color: white; /* Texto blanco */
+    background-color: #007bff;
+    /* Azul fuerte */
+    color: white;
+    /* Texto blanco */
     font-weight: bold;
     text-transform: uppercase;
 }
 
 .table tr:nth-child(even) {
-    background-color: #f8f9fa; /* Color alternado para filas */
+    background-color: #f8f9fa;
+    /* Color alternado para filas */
 }
 
 /* Botones de la tabla */
@@ -111,7 +118,8 @@ h2 {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background-color: #ff8800; /* Naranja de acento */
+    background-color: #ff8800;
+    /* Naranja de acento */
     color: white;
     font-size: 0.9rem;
     transition: background 0.3s ease-in-out;
@@ -122,7 +130,8 @@ h2 {
 }
 
 .table td .delete-button {
-    background-color: #e53935; /* Rojo */
+    background-color: #e53935;
+    /* Rojo */
 }
 
 .table td .delete-button:hover {
@@ -232,6 +241,7 @@ h2 {
 }
 
 @media (max-width: 480px) {
+
     .table th,
     .table td {
         padding: 0.5rem;

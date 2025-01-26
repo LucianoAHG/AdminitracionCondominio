@@ -65,14 +65,14 @@ const Actas = () => {
     const handleSearch = (e) => {
         const value = e.target.value.toLowerCase();
         setSearch(value);
-    
+
         setFilteredActas(
             actas.filter((acta) => {
                 const fecha = acta.Fecha ? acta.Fecha.toLowerCase() : '';
                 const detalle = acta.Detalle ? acta.Detalle.toLowerCase() : '';
                 const acuerdo = acta.Acuerdo ? acta.Acuerdo.toLowerCase() : '';
                 const socios = acta.Socios ? acta.Socios.toLowerCase() : '';
-    
+
                 return (
                     fecha.includes(value) ||
                     detalle.includes(value) ||
@@ -82,7 +82,7 @@ const Actas = () => {
             })
         );
     };
-    
+
 
     const handleCreateActa = async () => {
         if (!canManageActas) return;
@@ -90,7 +90,7 @@ const Actas = () => {
         const actaData = {
             ...newActa,
             Invitados: newActa.Invitados.trim(),
-            Socios: newActa.IdUsuarios, 
+            Socios: newActa.IdUsuarios,
         };
 
         try {

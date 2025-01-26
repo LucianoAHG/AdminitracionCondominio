@@ -15,9 +15,11 @@ h2 {
 /* Grid Layout */
 .organizacion-grid {
     display: flex;
-    flex-wrap: wrap; /* Permite que las tarjetas pasen a la siguiente fila si el espacio es insuficiente */
+    flex-wrap: wrap;
+    /* Permite que las tarjetas pasen a la siguiente fila si el espacio es insuficiente */
     gap: 1.5rem;
-    justify-content: center; /* Centra las tarjetas horizontalmente */
+    justify-content: center;
+    /* Centra las tarjetas horizontalmente */
 }
 
 /* Estilizaci�n de las Tarjetas */
@@ -26,8 +28,10 @@ h2 {
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 1.5rem;
-    flex: 1 1 calc(33.33% - 1rem); /* Tres tarjetas por fila como m�ximo */
-    max-width: 350px; /* Tama�o m�ximo para mantenerlas uniformes */
+    flex: 1 1 calc(33.33% - 1rem);
+    /* Tres tarjetas por fila como m�ximo */
+    max-width: 350px;
+    /* Tama�o m�ximo para mantenerlas uniformes */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -37,26 +41,28 @@ h2 {
     border-left: 5px solid transparent;
 }
 
-    .organizacion-card:hover {
-        transform: scale(1.05); /* Efecto de escala al pasar el mouse */
-        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-    }
+.organizacion-card:hover {
+    transform: scale(1.05);
+    /* Efecto de escala al pasar el mouse */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
 
-    /* Colores espec�ficos por rol */
-    .organizacion-card.presidente {
-        border-left-color: #007bff;
-    }
+/* Colores espec�ficos por rol */
+.organizacion-card.presidente {
+    border-left-color: #007bff;
+}
 
-    .organizacion-card.secretario {
-        border-left-color: #28a745;
-    }
+.organizacion-card.secretario {
+    border-left-color: #28a745;
+}
 
-    .organizacion-card.tesorero {
-        border-left-color: #ffc107;
-    }
-    .organizacion-card.socio {
-        border-left-color: #00eeff;
-    }
+.organizacion-card.tesorero {
+    border-left-color: #ffc107;
+}
+
+.organizacion-card.socio {
+    border-left-color: #00eeff;
+}
 
 /* Contenido de las Tarjetas */
 .card-content {
@@ -88,7 +94,8 @@ h2 {
     font-style: italic;
 }
 
-.card-contact, .card-phone {
+.card-contact,
+.card-phone {
     color: #666;
     font-size: 0.9rem;
     margin: 0.5rem 0;
@@ -96,7 +103,8 @@ h2 {
     align-items: center;
 }
 
-.contact-icon, .phone-icon {
+.contact-icon,
+.phone-icon {
     margin-right: 0.5rem;
 }
 
@@ -108,7 +116,8 @@ h2 {
     gap: 0.5rem;
 }
 
-.edit-button, .delete-button {
+.edit-button,
+.delete-button {
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 5px;
@@ -125,15 +134,15 @@ h2 {
     color: white;
 }
 
-    .edit-button:hover {
-        background-color: #218838;
-    }
+.edit-button:hover {
+    background-color: #218838;
+}
 
 .delete-button {
     background-color: #dc3545;
     color: white;
 }
 
-    .delete-button:hover {
-        background-color: #c82333;
-    }
+.delete-button:hover {
+    background-color: #c82333;
+}

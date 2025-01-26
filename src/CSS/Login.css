@@ -29,19 +29,22 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-#input-group-email, #input-group-password {
+#input-group-email,
+#input-group-password {
     margin-bottom: 1.5rem;
     position: relative;
 }
 
-#input-label-email, #input-label-password {
+#input-label-email,
+#input-label-password {
     font-size: 0.9rem;
     font-weight: 500;
     margin-bottom: 0.5rem;
     color: #d1d1d1;
 }
 
-#input-with-icon-email, #input-with-icon-password {
+#input-with-icon-email,
+#input-with-icon-password {
     display: flex;
     align-items: center;
     background: rgba(255, 255, 255, 0.2);
@@ -51,17 +54,20 @@
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
-    #input-with-icon-email:hover, #input-with-icon-password:hover {
-        background: rgba(255, 255, 255, 0.3);
-    }
+#input-with-icon-email:hover,
+#input-with-icon-password:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
 
-#icon-email, #icon-password {
+#icon-email,
+#icon-password {
     margin-right: 0.8rem;
     color: #d1d1d1;
     font-size: 1.4rem;
 }
 
-#email, #password {
+#email,
+#password {
     flex: 1;
     padding: 0.5rem;
     border: none;
@@ -72,9 +78,10 @@
     font-size: 1rem;
 }
 
-    #email::placeholder, #password::placeholder {
-        color: #cccccc;
-    }
+#email::placeholder,
+#password::placeholder {
+    color: #cccccc;
+}
 
 #forgot-password {
     margin-bottom: 1rem;
@@ -89,9 +96,9 @@
     transition: color 0.3s;
 }
 
-    #forgot-password-link:hover {
-        color: #ffffff;
-    }
+#forgot-password-link:hover {
+    color: #ffffff;
+}
 
 #error-message {
     color: #ff4d4d;
@@ -113,12 +120,12 @@
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-    #login-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 204, 255, 0.5);
-    }
+#login-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 204, 255, 0.5);
+}
 
-    #login-button:active {
-        transform: scale(0.98);
-        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
-    }
+#login-button:active {
+    transform: scale(0.98);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+}

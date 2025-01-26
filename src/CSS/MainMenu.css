@@ -52,17 +52,17 @@ body {
     align-items: center;
 }
 
-    .menu-sidebar li:hover {
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateX(5px);
-    }
+.menu-sidebar li:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
 
-    .menu-sidebar li.active {
-        background: rgba(255, 255, 255, 0.2);
-        font-weight: bold;
-        border-left: 4px solid #00bcd4;
-        padding-left: calc(1rem - 4px);
-    }
+.menu-sidebar li.active {
+    background: rgba(255, 255, 255, 0.2);
+    font-weight: bold;
+    border-left: 4px solid #00bcd4;
+    padding-left: calc(1rem - 4px);
+}
 
 .menu-item-icon {
     margin-right: 0.5rem;
@@ -76,7 +76,7 @@ body {
     position: relative;
 }
 
-/* Contenedor de usuario en la parte inferior del menú */
+/* Contenedor de usuario en la parte inferior del menï¿½ */
 #user-container {
     display: flex;
     align-items: center;
@@ -88,9 +88,9 @@ body {
     transition: background 0.3s;
 }
 
-    #user-container:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
+#user-container:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
 
 #user-icon {
     font-size: 2rem;
@@ -112,19 +112,23 @@ body {
 #logout-icon {
     font-size: 1.5rem;
     color: #e53935;
-    margin-left: auto; /* Alinea el icono a la derecha */
+    margin-left: auto;
+    /* Alinea el icono a la derecha */
     cursor: pointer;
     transition: color 0.3s;
-    animation: blink 1.5s infinite; /* Aplicamos la animación de parpadeo */
+    animation: blink 1.5s infinite;
+    /* Aplicamos la animaciï¿½n de parpadeo */
 }
 
-    #logout-icon:hover {
-        color: #c62828;
-    }
+#logout-icon:hover {
+    color: #c62828;
+}
 
-/* Animación de parpadeo */
+/* Animaciï¿½n de parpadeo */
 @keyframes blink {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
 

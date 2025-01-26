@@ -25,8 +25,8 @@ const MainMenu = () => {
         { label: 'Cuota', icon: <FaMoneyBill />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Socio'] },
         { label: 'Ingresos/Egresos', icon: <FaBalanceScale />, roles: ['Administrador', 'Presidente', 'Tesorero'] },
         { label: 'Organización (Composición Comité)', icon: <FaUsers />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Socio'] },
-        { label: 'Registro Auditoría', icon: <FaFileAlt />, roles: ['Administrador', 'Presidente', ] },
-        { label: 'Usuarios', icon: <FaUser />, roles: ['Administrador', 'Presidente', ] },
+        { label: 'Registro Auditoría', icon: <FaFileAlt />, roles: ['Administrador', 'Presidente',] },
+        { label: 'Usuarios', icon: <FaUser />, roles: ['Administrador', 'Presidente',] },
     ];
 
     // Filtrar elementos del menú según el rol del usuario

@@ -3,7 +3,8 @@
     margin: 20px auto;
     padding: 20px;
     max-width: 1200px;
-    background-color: #f8f9fa; /* Fondo blanco */
+    background-color: #f8f9fa;
+    /* Fondo blanco */
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
@@ -12,7 +13,8 @@
 /* Títulos */
 .usuarios-container h2,
 .usuarios-container h3 {
-    color: #007bff; /* Azul principal */
+    color: #007bff;
+    /* Azul principal */
     margin-bottom: 20px;
 }
 
@@ -49,7 +51,8 @@
 /* Botón Agregar Usuario */
 .add-button {
     display: inline-block;
-    background-color: #007bff; /* Azul */
+    background-color: #007bff;
+    /* Azul */
     color: white;
     padding: 10px 20px;
     border: none;
@@ -62,7 +65,8 @@
 }
 
 .add-button:hover {
-    background-color: #0056b3; /* Azul más oscuro */
+    background-color: #0056b3;
+    /* Azul más oscuro */
 }
 
 /* Tabla */
@@ -73,22 +77,27 @@
 }
 
 .usuarios-table th {
-    background-color: #007bff; /* Azul */
+    background-color: #007bff;
+    /* Azul */
     color: white;
     padding: 10px;
     font-weight: bold;
 }
 
 .usuarios-table td {
-    background-color: #ffffff; /* Blanco */
-    color: #495057; /* Gris oscuro */
+    background-color: #ffffff;
+    /* Blanco */
+    color: #495057;
+    /* Gris oscuro */
     padding: 10px;
-    border-bottom: 1px solid #dee2e6; /* Línea divisoria */
+    border-bottom: 1px solid #dee2e6;
+    /* Línea divisoria */
 }
 
 /* Hover en filas de la tabla */
 .usuarios-table tr:hover td {
-    background-color: #e9ecef; /* Fondo gris claro en hover */
+    background-color: #e9ecef;
+    /* Fondo gris claro en hover */
 }
 
 /* Botones de acción en la tabla */
@@ -103,12 +112,14 @@
 }
 
 .edit-button:hover {
-    color: #28a745; /* Verde */
+    color: #28a745;
+    /* Verde */
     transform: scale(1.2);
 }
 
 .delete-button:hover {
-    color: #dc3545; /* Rojo */
+    color: #dc3545;
+    /* Rojo */
     transform: scale(1.2);
 }
 
@@ -174,7 +185,8 @@
 
 /* Botones del Modal */
 .modal-buttons .submit-button {
-    background-color: #007bff; /* Azul */
+    background-color: #007bff;
+    /* Azul */
     color: white;
     border: none;
     padding: 10px 15px;
@@ -190,7 +202,8 @@
 }
 
 .modal-buttons .cancel-button {
-    background-color: #dc3545; /* Rojo */
+    background-color: #dc3545;
+    /* Rojo */
     color: white;
     border: none;
     padding: 10px 15px;
@@ -201,11 +214,13 @@
 }
 
 .modal-buttons .cancel-button:hover {
-    background-color: #c82333; /* Rojo más oscuro */
+    background-color: #c82333;
+    /* Rojo más oscuro */
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+
     .usuarios-table th,
     .usuarios-table td {
         padding: 8px;
@@ -223,6 +238,7 @@
 }
 
 @media (max-width: 480px) {
+
     .usuarios-table th,
     .usuarios-table td {
         font-size: 12px;
