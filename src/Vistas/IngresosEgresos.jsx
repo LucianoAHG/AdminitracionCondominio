@@ -1,14 +1,18 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import { FaSearch } from 'react-icons/fa';
+import ReactPaginate from 'react-paginate';
 import axios from 'axios';
 import '../CSS/IngresosEgresos.css';
 
 const IngresosEgresos = () => {
     const [registros, setRegistros] = useState([]);
     const [usuarios, setUsuarios] = useState([]);
-    const [search, setSearch] = useState('');
-    const [filteredRegistros, setFilteredRegistros] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 10;
+
     const [newRegistro, setNewRegistro] = useState({
         Tipo: 'ingreso',
         Categoria: '',
@@ -29,7 +33,6 @@ const IngresosEgresos = () => {
             const response = await axios.get(`${baseUrl}?action=fetch`);
             if (response.data.status === 'success') {
                 setRegistros(response.data.data || []);
-                setFilteredRegistros(response.data.data || []);
             } else {
                 console.error('Error al obtener los registros:', response.data.message);
             }
@@ -44,10 +47,10 @@ const IngresosEgresos = () => {
             if (response.data.status === 'success') {
                 setUsuarios(response.data.data || []);
             } else {
-                console.error('Error al obtener socios:', response.data.message);
+                console.error('Error al obtener usuarios:', response.data.message);
             }
         } catch (error) {
-            console.error('Error al obtener socios:', error.message);
+            console.error('Error al obtener usuarios:', error.message);
         }
     };
 
@@ -57,16 +60,22 @@ const IngresosEgresos = () => {
     };
 
     const handleSearch = (e) => {
-        const value = e.target.value.toLowerCase();
-        setSearch(value);
-        setFilteredRegistros(
-            registros.filter(
-                (registro) =>
-                    registro.Categoria.toLowerCase().includes(value) ||
-                    registro.Tipo.toLowerCase().includes(value) ||
-                    (registro.UsuarioNombre && registro.UsuarioNombre.toLowerCase().includes(value))
-            )
-        );
+        setSearchTerm(e.target.value.toLowerCase());
+        setCurrentPage(0);
+    };
+
+    const filteredData = registros.filter(
+        (registro) =>
+            registro.Categoria.toLowerCase().includes(searchTerm) ||
+            registro.Tipo.toLowerCase().includes(searchTerm) ||
+            (registro.UsuarioNombre && registro.UsuarioNombre.toLowerCase().includes(searchTerm))
+    );
+
+    const offset = currentPage * itemsPerPage;
+    const paginatedData = filteredData.slice(offset, offset + itemsPerPage);
+
+    const handlePageClick = ({ selected }) => {
+        setCurrentPage(selected);
     };
 
     const handleCreateRegistro = async () => {
@@ -104,16 +113,22 @@ const IngresosEgresos = () => {
     return (
         <div className="ingresos-egresos-container">
             <h2>Gestión de Ingresos y Egresos</h2>
+
+            <div className="search-bar">
+                <FaSearch className="search-icon" />
+                <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Buscar por categoría, tipo o usuario"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                />
+            </div>
+
             <Button className="add-button" onClick={handleOpenModal}>
                 + Agregar Registro
             </Button>
-            <input
-                type="text"
-                className="search-input"
-                placeholder="Buscar por categoría, tipo o usuario"
-                value={search}
-                onChange={handleSearch}
-            />
+
             <table className="table">
                 <thead>
                     <tr>
@@ -127,27 +142,47 @@ const IngresosEgresos = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredRegistros.map((registro) => (
-                        <tr key={registro.Id}>
-                            <td>{registro.Fecha}</td>
-                            <td>{registro.Tipo}</td>
-                            <td>{registro.Categoria}</td>
-                            <td>{registro.Descripcion}</td>
-                            <td>${parseFloat(registro.Monto || 0).toLocaleString('es-CL')}</td>
-                            <td>{registro.UsuarioNombre || 'No asignado'}</td>
-                            <td>
-                                <Button
-                                    variant="danger"
-                                    className="delete-button"
-                                    onClick={() => handleDeleteRegistro(registro.Id)}
-                                >
-                                    Eliminar
-                                </Button>
-                            </td>
+                    {paginatedData.length > 0 ? (
+                        paginatedData.map((registro) => (
+                            <tr key={registro.Id}>
+                                <td>{registro.Fecha}</td>
+                                <td>{registro.Tipo}</td>
+                                <td>{registro.Categoria}</td>
+                                <td>{registro.Descripcion}</td>
+                                <td>${parseFloat(registro.Monto || 0).toLocaleString('es-CL')}</td>
+                                <td>{registro.UsuarioNombre || 'No asignado'}</td>
+                                <td>
+                                    <Button
+                                        variant="danger"
+                                        className="delete-button"
+                                        onClick={() => handleDeleteRegistro(registro.Id)}
+                                    >
+                                        Eliminar
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="7" className="no-results">No se encontraron registros</td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
+
+            <div id="pagination">
+                <ReactPaginate
+                    previousLabel={'←'}
+                    nextLabel={'→'}
+                    pageCount={Math.ceil(filteredData.length / itemsPerPage)}
+                    onPageChange={handlePageClick}
+                    containerClassName="pagination"
+                    activeClassName="active"
+                    breakLabel="..."
+                    marginPagesDisplayed={1}
+                    pageRangeDisplayed={3}
+                />
+            </div>
 
             <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
                 <Modal.Header closeButton>
@@ -155,55 +190,23 @@ const IngresosEgresos = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="create-form">
-                        <select
-                            value={newRegistro.Tipo}
-                            onChange={(e) => setNewRegistro({ ...newRegistro, Tipo: e.target.value })}
-                        >
+                        <label>Tipo:</label>
+                        <select value={newRegistro.Tipo} onChange={(e) => setNewRegistro({ ...newRegistro, Tipo: e.target.value })}>
                             <option value="ingreso">Ingreso</option>
                             <option value="egreso">Egreso</option>
                         </select>
+                        <label>Categoría:</label>
                         <input
                             type="text"
                             placeholder="Categoría"
                             value={newRegistro.Categoria}
                             onChange={(e) => setNewRegistro({ ...newRegistro, Categoria: e.target.value })}
                         />
-                        <textarea
-                            placeholder="Descripción"
-                            value={newRegistro.Descripcion}
-                            onChange={(e) => setNewRegistro({ ...newRegistro, Descripcion: e.target.value })}
-                        />
-                        <input
-                            type="number"
-                            placeholder="Monto"
-                            value={newRegistro.Monto}
-                            onChange={(e) => setNewRegistro({ ...newRegistro, Monto: e.target.value })}
-                        />
-                        <input
-                            type="date"
-                            value={newRegistro.Fecha}
-                            onChange={(e) => setNewRegistro({ ...newRegistro, Fecha: e.target.value })}
-                        />
-                        <select
-                            value={newRegistro.IdUsuario}
-                            onChange={(e) => setNewRegistro({ ...newRegistro, IdUsuario: e.target.value })}
-                        >
-                            <option value="">Seleccionar Usuario</option>
-                            {usuarios.map((usuario) => (
-                                <option key={usuario.Id} value={usuario.Id}>
-                                    {usuario.Nombre}
-                                </option>
-                            ))}
-                        </select>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="success" onClick={handleCreateRegistro}>
-                        Crear
-                    </Button>
-                    <Button variant="danger" onClick={() => setShowCreateModal(false)}>
-                        Cancelar
-                    </Button>
+                    <Button variant="success" onClick={handleCreateRegistro}>Crear</Button>
+                    <Button variant="danger" onClick={() => setShowCreateModal(false)}>Cancelar</Button>
                 </Modal.Footer>
             </Modal>
         </div>

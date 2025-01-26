@@ -1,5 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import { FaSearch, FaEye } from 'react-icons/fa';
+import ReactPaginate from 'react-paginate';
 import axios from 'axios';
 import '../CSS/Actas.css';
 
@@ -9,6 +11,9 @@ const Actas = () => {
     const [search, setSearch] = useState('');
     const [filteredActas, setFilteredActas] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 10;
+
     const [newActa, setNewActa] = useState({
         Fecha: '',
         Numero: '',
@@ -64,7 +69,7 @@ const Actas = () => {
             actas.filter(
                 (acta) =>
                     acta.Detalle.toLowerCase().includes(value) ||
-                    acta.Acuerdo.toLowerCase().includes(value)
+                    acta.Acuerdo.toLowerCase().includes(value) 
             )
         );
     };
@@ -75,7 +80,7 @@ const Actas = () => {
         const actaData = {
             ...newActa,
             Invitados: newActa.Invitados.trim(),
-            Socios: newActa.IdUsuarios, // Enviar los IDs seleccionados
+            Socios: newActa.IdUsuarios, 
         };
 
         try {
@@ -115,21 +120,32 @@ const Actas = () => {
         }
     };
 
+    // Paginación
+    const offset = currentPage * itemsPerPage;
+    const paginatedData = filteredActas.slice(offset, offset + itemsPerPage);
+
+    const handlePageClick = ({ selected }) => {
+        setCurrentPage(selected);
+    };
+
     return (
         <div className="actas-container">
             <h2>Gestión de Actas</h2>
+            <div className="actas-search-bar">
+                <FaSearch id="acta-search-icon" />
+                <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Buscar por detalle o acuerdo"
+                    value={search}
+                    onChange={handleSearch}
+                />
+            </div>
             {canManageActas && (
                 <Button className="add-button" onClick={() => setShowCreateModal(true)}>
                     + Agregar Acta
                 </Button>
             )}
-            <input
-                type="text"
-                className="search-input"
-                placeholder="Buscar por detalle o acuerdo"
-                value={search}
-                onChange={handleSearch}
-            />
             <table className="table">
                 <thead>
                     <tr>
@@ -143,13 +159,13 @@ const Actas = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredActas.map((acta) => (
+                    {paginatedData.map((acta) => (
                         <tr key={acta.Id}>
                             <td>{acta.Fecha || 'No registrada'}</td>
                             <td>{acta.Numero || 'No registrado'}</td>
                             <td>{acta.Detalle || 'No registrado'}</td>
                             <td>{acta.Acuerdo || 'No registrado'}</td>
-                            <td>{acta.Socios || 'Sin socios asociados'}</td> {/* Mostrar nombres de socios */}
+                            <td>{acta.Socios || 'Sin socios asociados'}</td>
                             <td>{acta.Invitados || 'No registrados'}</td>
                             <td>
                                 {canManageActas && (
@@ -166,6 +182,20 @@ const Actas = () => {
                     ))}
                 </tbody>
             </table>
+
+            <div id="actas-pagination">
+                <ReactPaginate
+                    previousLabel={'←'}
+                    nextLabel={'→'}
+                    pageCount={Math.ceil(filteredActas.length / itemsPerPage)}
+                    onPageChange={handlePageClick}
+                    containerClassName="actas-pagination"
+                    activeClassName="active"
+                    breakLabel="..."
+                    marginPagesDisplayed={1}
+                    pageRangeDisplayed={3}
+                />
+            </div>
 
             <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
                 <Modal.Header closeButton>
@@ -189,32 +219,6 @@ const Actas = () => {
                         <textarea
                             value={newActa.Detalle}
                             onChange={(e) => setNewActa({ ...newActa, Detalle: e.target.value })}
-                        />
-                        <label>Acuerdo:</label>
-                        <textarea
-                            value={newActa.Acuerdo}
-                            onChange={(e) => setNewActa({ ...newActa, Acuerdo: e.target.value })}
-                        />
-                        <label>Seleccionar socios:</label>
-                        <select
-                            multiple
-                            value={newActa.IdUsuarios}
-                            onChange={(e) => {
-                                const selectedIds = Array.from(e.target.selectedOptions, (option) => option.value);
-                                setNewActa({ ...newActa, IdUsuarios: selectedIds });
-                            }}
-                        >
-                            {usuarios.map((usuario) => (
-                                <option key={usuario.Id} value={usuario.Id}>
-                                    {usuario.Nombre}
-                                </option>
-                            ))}
-                        </select>
-                        <label>Invitados:</label>
-                        <textarea
-                            placeholder="Invitados manuales"
-                            value={newActa.Invitados}
-                            onChange={(e) => setNewActa({ ...newActa, Invitados: e.target.value })}
                         />
                     </div>
                 </Modal.Body>

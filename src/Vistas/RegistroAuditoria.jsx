@@ -9,7 +9,7 @@ const RegistroAuditoria = () => {
     const [auditoriaData, setAuditoriaData] = useState([]);
     const [usuarios, setUsuarios] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 10;
+    const itemsPerPage = 15;
 
     const baseUrlAuditoria = 'https://elias.go.miorganizacion.cl/api/auditoria.php';
     const baseUrlUsuarios = 'https://elias.go.miorganizacion.cl/api/usuarios.php';
@@ -61,8 +61,15 @@ const RegistroAuditoria = () => {
         UsuarioNombre: getUsuarioNombre(registro.IdUsuario),
     }));
 
+    // Ordenar registros por fecha y hora en orden descendente (últimos registros primero)
+    const sortedData = auditoriaConUsuarios.sort((a, b) => {
+        const dateA = new Date(`${a.Fecha}T${a.Hora}`);
+        const dateB = new Date(`${b.Fecha}T${b.Hora}`);
+        return dateB - dateA; // Orden descendente
+    });
+
     // Filtrar registros por término de búsqueda
-    const filteredData = auditoriaConUsuarios.filter((registro) => {
+    const filteredData = sortedData.filter((registro) => {
         const usuarioNombre = registro.UsuarioNombre.toLowerCase();
         return (
             usuarioNombre.includes(searchTerm.toLowerCase()) ||
@@ -136,8 +143,8 @@ const RegistroAuditoria = () => {
 
             <div id="auditoria-pagination-container">
                 <ReactPaginate
-                    previousLabel={'← Anterior'}
-                    nextLabel={'Siguiente →'}
+                    previousLabel={'←'}
+                    nextLabel={'→'}
                     pageCount={Math.ceil(filteredData.length / itemsPerPage)}
                     onPageChange={handlePageClick}
                     containerClassName="auditoria-pagination"

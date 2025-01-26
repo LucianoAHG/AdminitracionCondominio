@@ -53,14 +53,14 @@ const Organizacion = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="card-actions">
+                        {/* <div className="card-actions">
                             <button className="edit-button" disabled>
                                 <FaEdit /> Editar
                             </button>
                             <button className="delete-button" disabled>
                                 <FaTrash /> Eliminar
                             </button>
-                        </div>
+                        </div> */}
                     </div>
                 ))}
             </div>
@@ -82,14 +82,14 @@ const Organizacion = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="card-actions">
+                        {/* <div className="card-actions">
                             <button className="edit-button" disabled>
                                 <FaEdit /> Editar
                             </button>
                             <button className="delete-button" disabled>
                                 <FaTrash /> Eliminar
                             </button>
-                        </div>
+                        </div> */}
                     </div>
                 ))}
             </div>

@@ -1,12 +1,18 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import { FaSearch, FaEye } from 'react-icons/fa';
+import ReactPaginate from 'react-paginate';
 import axios from 'axios';
 import '../CSS/Cuotas.css';
 
 const Cuotas = () => {
     const [cuotas, setCuotas] = useState([]);
     const [usuarios, setUsuarios] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 15;
+    
     const [newCuota, setNewCuota] = useState({
         IdUsuarios: [],
         Monto: '',
@@ -29,9 +35,10 @@ const Cuotas = () => {
         try {
             const response = await axios.get(`${baseUrlCuotas}?action=fetch`);
             if (response.data.status === 'success') {
-                const filteredCuotas = userRole === 'Usuario'
-                    ? response.data.data.filter((cuota) => cuota.IdUsuario === userId)
-                    : response.data.data;
+                const filteredCuotas =
+                    userRole === 'Usuario'
+                        ? response.data.data.filter((cuota) => cuota.IdUsuario === userId)
+                        : response.data.data;
                 setCuotas(filteredCuotas);
             } else {
                 console.error('Error al obtener cuotas:', response.data.message);
@@ -98,42 +105,44 @@ const Cuotas = () => {
         }
     };
 
-    const handleUpdateEstadoCuota = async (id, newEstado) => {
-        try {
-            const response = await axios.get(`${baseUrlCuotas}?action=updateEstado&id=${id}&estado=${newEstado}`);
-            if (response.data.status === 'success') {
-                alert('Estado de la cuota actualizado');
-                fetchCuotas();
-            } else {
-                console.error('Error al actualizar estado:', response.data.message);
-            }
-        } catch (error) {
-            console.error('Error al actualizar estado:', error.message);
-        }
-    };
+    // Filtrar registros por término de búsqueda
+    const filteredData = cuotas.filter((cuota) => {
+        return (
+            (cuota.UsuarioNombre && cuota.UsuarioNombre.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            cuota.Monto.toString().includes(searchTerm) ||
+            cuota.Estado.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            cuota.FechaPago.includes(searchTerm)
+        );
+    });
 
-    const handleUpdateFechaPago = async (id, newFechaPago) => {
-        try {
-            const response = await axios.get(`${baseUrlCuotas}?action=updateFechaPago&id=${id}&fechaPago=${newFechaPago}`);
-            if (response.data.status === 'success') {
-                alert('Fecha de pago actualizada');
-                fetchCuotas();
-            } else {
-                console.error('Error al actualizar fecha de pago:', response.data.message);
-            }
-        } catch (error) {
-            console.error('Error al actualizar fecha de pago:', error.message);
-        }
+    // Paginación de datos
+    const offset = currentPage * itemsPerPage;
+    const paginatedData = filteredData.slice(offset, offset + itemsPerPage);
+
+    const handlePageClick = ({ selected }) => {
+        setCurrentPage(selected);
     };
 
     return (
         <div className="cuotas-container">
             <h2>Gestión de Cuotas</h2>
+
+            <div className="cuotas-search-bar">
+                <FaSearch id="cuota-search-icon" />
+                <input
+                    type="text"
+                    placeholder="Buscar por socio, monto o estado..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
             {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(userRole) && (
                 <Button className="add-button" onClick={() => setShowCreateModal(true)}>
                     + Crear Cuota
                 </Button>
             )}
+
             <table className="table">
                 <thead>
                     <tr>
@@ -145,54 +154,49 @@ const Cuotas = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {cuotas.map((cuota) => (
-                        <tr key={cuota.Id}>
-                            <td>{cuota.UsuarioNombre || 'No asignado'}</td>
-                            <td>${parseFloat(cuota.Monto || 0).toLocaleString('es-CL')}</td>
-                            <td>
-                                {userRole === 'Tesorero' ? (
-                                    <select
-                                        value={cuota.Estado}
-                                        onChange={(e) => {
-                                            handleUpdateEstadoCuota(cuota.Id, e.target.value);
-                                            if (e.target.value === 'Pendiente') {
-                                                handleUpdateFechaPago(cuota.Id, '----/--/--');
-                                            }
-                                        }}
-                                    >
-                                        <option value="Pendiente">Pendiente</option>
-                                        <option value="Pagada">Pagada</option>
-                                    </select>
-                                ) : (
-                                    cuota.Estado
-                                )}
-                            </td>
-                            <td>
-                                {userRole === 'Tesorero' && cuota.Estado === 'Pagada' ? (
-                                    <input
-                                        type="date"
-                                        value={cuota.FechaPago || ''}
-                                        onChange={(e) => handleUpdateFechaPago(cuota.Id, e.target.value)}
-                                    />
-                                ) : (
-                                    cuota.Estado === 'Pendiente' ? '----/--/--' : cuota.FechaPago || 'No registrada'
-                                )}
-                            </td>
-                            <td>
-                                {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(userRole) && (
-                                    <Button
-                                        variant="danger"
-                                        className="delete-button"
-                                        onClick={() => handleDeleteCuota(cuota.Id)}
-                                    >
-                                        Eliminar
-                                    </Button>
-                                )}
+                    {paginatedData.length > 0 ? (
+                        paginatedData.map((cuota) => (
+                            <tr key={cuota.Id}>
+                                <td>{cuota.UsuarioNombre || 'No asignado'}</td>
+                                <td>${parseFloat(cuota.Monto || 0).toLocaleString('es-CL')}</td>
+                                <td>{cuota.Estado}</td>
+                                <td>{cuota.FechaPago || 'No registrada'}</td>
+                                <td>
+                                    {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(userRole) && (
+                                        <Button
+                                            variant="danger"
+                                            className="delete-button"
+                                            onClick={() => handleDeleteCuota(cuota.Id)}
+                                        >
+                                            Eliminar
+                                        </Button>
+                                    )}
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="5" className="no-results">
+                                No se encontraron resultados
                             </td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
+
+            <div id="cuotas-pagination">
+                <ReactPaginate
+                    previousLabel={'←'}
+                    nextLabel={'→'}
+                    pageCount={Math.ceil(filteredData.length / itemsPerPage)}
+                    onPageChange={handlePageClick}
+                    containerClassName="cuotas-pagination"
+                    activeClassName="active"
+                    breakLabel="..."
+                    marginPagesDisplayed={1}
+                    pageRangeDisplayed={3}
+                />
+            </div>
 
             <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
                 <Modal.Header closeButton>
@@ -223,12 +227,6 @@ const Cuotas = () => {
                             placeholder="Monto"
                             value={newCuota.Monto}
                             onChange={(e) => setNewCuota({ ...newCuota, Monto: e.target.value })}
-                        />
-                        <label>Fecha de Pago (opcional):</label>
-                        <input
-                            type="date"
-                            value={newCuota.FechaPago}
-                            onChange={(e) => setNewCuota({ ...newCuota, FechaPago: e.target.value })}
                         />
                     </div>
                 </Modal.Body>
