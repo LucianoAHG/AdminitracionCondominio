@@ -3,12 +3,18 @@ import axios from 'axios';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faUser, faEnvelope, faPhone, faLock } from '@fortawesome/free-solid-svg-icons';
+import { FaSearch } from 'react-icons/fa';
+import ReactPaginate from 'react-paginate';
 import '../CSS/Usuarios.css';
 
 const Usuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [roles, setRoles] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 10;
+
     const [formData, setFormData] = useState({
         usuarioNombre: '',
         usuarioCorreo: '',
@@ -16,6 +22,7 @@ const Usuarios = () => {
         usuarioPassword: '',
         usuarioRol: ''
     });
+
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
 
@@ -87,7 +94,7 @@ const Usuarios = () => {
             usuarioNombre: usuario?.Nombre || '',
             usuarioCorreo: usuario?.Correo || '',
             usuarioTelefono: usuario?.Telefono || '',
-            usuarioPassword: '', // La contraseña no se muestra ni se edita directamente.
+            usuarioPassword: '',
             usuarioRol: roles.find((rol) => rol.Nombre === usuario?.RolNombre)?.Id || ''
         });
         setEditId(usuario?.Id);
@@ -128,21 +135,44 @@ const Usuarios = () => {
         setIsEditing(false);
     };
 
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value.toLowerCase());
+        setCurrentPage(0);
+    };
+
+    const filteredUsuarios = usuarios.filter((usuario) =>
+        usuario.Nombre.toLowerCase().includes(searchTerm) ||
+        usuario.Correo.toLowerCase().includes(searchTerm) ||
+        usuario.Telefono.toLowerCase().includes(searchTerm) ||
+        usuario.RolNombre.toLowerCase().includes(searchTerm)
+    );
+
+    const offset = currentPage * itemsPerPage;
+    const paginatedUsuarios = filteredUsuarios.slice(offset, offset + itemsPerPage);
+
+    const handlePageClick = ({ selected }) => {
+        setCurrentPage(selected);
+    };
+
     return (
         <div className="usuarios-container">
             <h2>Gestión de Socios</h2>
 
-            <Button
-                className="add-button"
-                onClick={() => {
-                    resetForm();
-                    setShowModal(true);
-                }}
-            >
+            <div className="usuarios-search-bar">
+                <FaSearch id="usuario-search-icon" />
+                <input
+                    type="text"
+                    placeholder="Buscar por nombre, correo, teléfono o rol..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    className="search-input"
+                />
+            </div>
+
+            <Button className="add-button" onClick={() => { resetForm(); setShowModal(true); }}>
                 Agregar Socio
             </Button>
 
-            <h3>Lista de Socios</h3>
             <table className="usuarios-table">
                 <thead>
                     <tr>
@@ -154,17 +184,17 @@ const Usuarios = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {usuarios.map((usuario) => (
-                        <tr key={usuario?.Id}>
-                            <td>{usuario?.Nombre || 'Sin Nombre'}</td>
-                            <td>{usuario?.Correo || 'Sin Correo'}</td>
-                            <td>{usuario?.Telefono || 'Sin Teléfono'}</td>
-                            <td>{usuario?.RolNombre || 'Sin Rol'}</td>
+                    {paginatedUsuarios.map((usuario) => (
+                        <tr key={usuario.Id}>
+                            <td>{usuario.Nombre}</td>
+                            <td>{usuario.Correo}</td>
+                            <td>{usuario.Telefono}</td>
+                            <td>{usuario.RolNombre}</td>
                             <td>
                                 <button className="edit-button" onClick={() => prepareEditUsuario(usuario)}>
                                     <FontAwesomeIcon icon={faEdit} />
                                 </button>
-                                <button className="delete-button" onClick={() => handleDeleteUsuario(usuario?.Id)}>
+                                <button className="delete-button" onClick={() => handleDeleteUsuario(usuario.Id)}>
                                     <FontAwesomeIcon icon={faTrash} />
                                 </button>
                             </td>
@@ -172,6 +202,18 @@ const Usuarios = () => {
                     ))}
                 </tbody>
             </table>
+
+            <ReactPaginate
+                previousLabel={'←'}
+                nextLabel={'→'}
+                pageCount={Math.ceil(filteredUsuarios.length / itemsPerPage)}
+                onPageChange={handlePageClick}
+                containerClassName="usuarios-pagination"
+                activeClassName="active"
+                breakLabel="..."
+                marginPagesDisplayed={1}
+                pageRangeDisplayed={3}
+            />
 
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Header closeButton>
@@ -181,85 +223,37 @@ const Usuarios = () => {
                     <Form onSubmit={handleFormSubmit}>
                         <Form.Group>
                             <Form.Label>Nombre</Form.Label>
-                            <div className="input-group">
-                                <FontAwesomeIcon icon={faUser} className="input-group-text" />
-                                <Form.Control
-                                    type="text"
-                                    name="usuarioNombre"
-                                    value={formData.usuarioNombre}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
+                            <Form.Control
+                                type="text"
+                                name="usuarioNombre"
+                                value={formData.usuarioNombre}
+                                onChange={handleInputChange}
+                                required
+                            />
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Correo</Form.Label>
-                            <div className="input-group">
-                                <FontAwesomeIcon icon={faEnvelope} className="input-group-text" />
-                                <Form.Control
-                                    type="email"
-                                    name="usuarioCorreo"
-                                    value={formData.usuarioCorreo}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-                        </Form.Group>
-                        <Form.Group>
-                            <Form.Label>Teléfono</Form.Label>
-                            <div className="input-group">
-                                <FontAwesomeIcon icon={faPhone} className="input-group-text" />
-                                <Form.Control
-                                    type="text"
-                                    name="usuarioTelefono"
-                                    value={formData.usuarioTelefono}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
+                            <Form.Control
+                                type="email"
+                                name="usuarioCorreo"
+                                value={formData.usuarioCorreo}
+                                onChange={handleInputChange}
+                                required
+                            />
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Contraseña</Form.Label>
-                            <div className="input-group">
-                                <FontAwesomeIcon icon={faLock} className="input-group-text" />
-                                <Form.Control
-                                    type="password"
-                                    name="usuarioPassword"
-                                    value={formData.usuarioPassword}
-                                    onChange={handleInputChange}
-                                    required={!isEditing}
-                                />
-                            </div>
-                        </Form.Group>
-                        <Form.Group>
-                            <Form.Label>Rol</Form.Label>
                             <Form.Control
-                                as="select"
-                                name="usuarioRol"
-                                value={formData.usuarioRol}
+                                type="password"
+                                name="usuarioPassword"
+                                value={formData.usuarioPassword}
                                 onChange={handleInputChange}
-                                required
-                            >
-                                <option value="">Seleccionar Rol</option>
-                                {roles.map((rol) => (
-                                    <option key={rol.Id} value={rol.Id}>
-                                        {rol.Nombre}
-                                    </option>
-                                ))}
-                            </Form.Control>
+                                required={!isEditing}
+                            />
                         </Form.Group>
-                        <div className="modal-buttons">
-                            <Button type="submit" className="submit-button">
-                                {isEditing ? 'Actualizar' : 'Crear'}
-                            </Button>
-                            <Button
-                                type="button"
-                                onClick={() => setShowModal(false)}
-                                className="cancel-button"
-                            >
-                                Cancelar
-                            </Button>
-                        </div>
+                        <Button type="submit" className="submit-button">
+                            {isEditing ? 'Actualizar' : 'Crear'}
+                        </Button>
                     </Form>
                 </Modal.Body>
             </Modal>

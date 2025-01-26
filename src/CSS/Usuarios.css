@@ -6,20 +6,49 @@
     background-color: #f8f9fa; /* Fondo blanco */
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
 }
 
-    /* T�tulos */
-    .usuarios-container h2,
-    .usuarios-container h3 {
-        text-align: center;
-        color: #007bff; /* Azul principal */
-        margin-bottom: 20px;
-    }
+/* Títulos */
+.usuarios-container h2,
+.usuarios-container h3 {
+    color: #007bff; /* Azul principal */
+    margin-bottom: 20px;
+}
 
-/* Bot�n Agregar Usuario */
+/* Barra de Búsqueda */
+.usuarios-search-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.usuarios-search-bar input {
+    width: 100%;
+    max-width: 500px;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.usuarios-search-bar input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+#usuario-search-icon {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+/* Botón Agregar Usuario */
 .add-button {
-    display: block;
-    margin: 0 auto 20px;
+    display: inline-block;
     background-color: #007bff; /* Azul */
     color: white;
     padding: 10px 20px;
@@ -29,13 +58,105 @@
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-bottom: 20px;
 }
 
-    .add-button:hover {
-        background-color: #0056b3; /* Azul m�s oscuro */
-    }
+.add-button:hover {
+    background-color: #0056b3; /* Azul más oscuro */
+}
 
-/* Formulario dentro del Modal */
+/* Tabla */
+.usuarios-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.usuarios-table th {
+    background-color: #007bff; /* Azul */
+    color: white;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.usuarios-table td {
+    background-color: #ffffff; /* Blanco */
+    color: #495057; /* Gris oscuro */
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6; /* Línea divisoria */
+}
+
+/* Hover en filas de la tabla */
+.usuarios-table tr:hover td {
+    background-color: #e9ecef; /* Fondo gris claro en hover */
+}
+
+/* Botones de acción en la tabla */
+.edit-button,
+.delete-button {
+    border: none;
+    background: none;
+    color: #495057;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.edit-button:hover {
+    color: #28a745; /* Verde */
+    transform: scale(1.2);
+}
+
+.delete-button:hover {
+    color: #dc3545; /* Rojo */
+    transform: scale(1.2);
+}
+
+/* Paginación */
+.usuarios-pagination {
+    display: flex;
+    list-style: none;
+    gap: 5px;
+    padding: 0;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.usuarios-pagination li {
+    display: inline;
+}
+
+.usuarios-pagination a {
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease-in-out;
+    font-size: 1rem;
+    display: inline-block;
+    min-width: 40px;
+    text-align: center;
+}
+
+.usuarios-pagination a:hover {
+    background-color: #0056b3;
+    border-color: #004999;
+}
+
+.usuarios-pagination .active a {
+    font-weight: bold;
+    background-color: #0056b3;
+}
+
+.usuarios-pagination .disabled a {
+    background-color: #ccc;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Estilos del Modal */
 .modal-body input,
 .modal-body select {
     width: 100%;
@@ -47,9 +168,9 @@
     color: #495057;
 }
 
-    .modal-body input::placeholder {
-        color: #adb5bd;
-    }
+.modal-body input::placeholder {
+    color: #adb5bd;
+}
 
 /* Botones del Modal */
 .modal-buttons .submit-button {
@@ -64,9 +185,9 @@
     transition: background-color 0.3s ease;
 }
 
-    .modal-buttons .submit-button:hover {
-        background-color: #0056b3;
-    }
+.modal-buttons .submit-button:hover {
+    background-color: #0056b3;
+}
 
 .modal-buttons .cancel-button {
     background-color: #dc3545; /* Rojo */
@@ -79,54 +200,41 @@
     transition: background-color 0.3s ease;
 }
 
-    .modal-buttons .cancel-button:hover {
-        background-color: #c82333; /* Rojo m�s oscuro */
-    }
-
-/* Tabla */
-.usuarios-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    text-align: center;
+.modal-buttons .cancel-button:hover {
+    background-color: #c82333; /* Rojo más oscuro */
 }
 
-    .usuarios-table th {
-        background-color: #007bff; /* Azul */
-        color: white;
-        padding: 10px;
-        font-weight: bold;
-    }
-
+/* Responsive Design */
+@media (max-width: 768px) {
+    .usuarios-table th,
     .usuarios-table td {
-        background-color: #ffffff; /* Blanco */
-        color: #495057; /* Gris oscuro */
-        padding: 10px;
-        border-bottom: 1px solid #dee2e6; /* L�nea divisoria */
+        padding: 8px;
+        font-size: 14px;
     }
 
-    /* Hover en filas de la tabla */
-    .usuarios-table tr:hover td {
-        background-color: #e9ecef; /* Fondo gris claro en hover */
+    .usuarios-search-bar input {
+        max-width: 100%;
     }
 
-/* Botones de acci�n en la tabla */
-.edit-button,
-.delete-button {
-    border: none;
-    background: none;
-    color: #495057;
-    font-size: 18px;
-    cursor: pointer;
-    transition: transform 0.2s ease, color 0.2s ease;
+    .usuarios-pagination a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
 }
 
-    .edit-button:hover {
-        color: #28a745; /* Verde */
-        transform: scale(1.2);
+@media (max-width: 480px) {
+    .usuarios-table th,
+    .usuarios-table td {
+        font-size: 12px;
+        padding: 6px;
     }
 
-    .delete-button:hover {
-        color: #dc3545; /* Rojo */
-        transform: scale(1.2);
+    .usuarios-pagination {
+        flex-wrap: wrap;
+        justify-content: center;
     }
+
+    .usuarios-pagination a {
+        font-size: 0.8rem;
+    }
+}

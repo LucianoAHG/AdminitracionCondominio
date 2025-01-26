@@ -70,12 +70,15 @@ const RegistroAuditoria = () => {
 
     // Filtrar registros por término de búsqueda
     const filteredData = sortedData.filter((registro) => {
-        const usuarioNombre = registro.UsuarioNombre.toLowerCase();
+        const usuarioNombre = registro.UsuarioNombre ? registro.UsuarioNombre.toLowerCase() : '';
+        const accion = registro.Accion ? registro.Accion.toLowerCase() : '';
+        const fecha = registro.Fecha ? registro.Fecha.toLowerCase() : '';
+        const search = searchTerm.toLowerCase();
+
         return (
-            usuarioNombre.includes(searchTerm.toLowerCase()) ||
-            registro.Id.toString().includes(searchTerm) ||
-            registro.Accion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            registro.Detalle.toLowerCase().includes(searchTerm.toLowerCase())
+            usuarioNombre.includes(search) ||
+            accion.includes(search) ||
+            fecha.includes(search)
         );
     });
 

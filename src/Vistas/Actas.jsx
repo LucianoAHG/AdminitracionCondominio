@@ -65,14 +65,24 @@ const Actas = () => {
     const handleSearch = (e) => {
         const value = e.target.value.toLowerCase();
         setSearch(value);
+    
         setFilteredActas(
-            actas.filter(
-                (acta) =>
-                    acta.Detalle.toLowerCase().includes(value) ||
-                    acta.Acuerdo.toLowerCase().includes(value) 
-            )
+            actas.filter((acta) => {
+                const fecha = acta.Fecha ? acta.Fecha.toLowerCase() : '';
+                const detalle = acta.Detalle ? acta.Detalle.toLowerCase() : '';
+                const acuerdo = acta.Acuerdo ? acta.Acuerdo.toLowerCase() : '';
+                const socios = acta.Socios ? acta.Socios.toLowerCase() : '';
+    
+                return (
+                    fecha.includes(value) ||
+                    detalle.includes(value) ||
+                    acuerdo.includes(value) ||
+                    socios.includes(value)
+                );
+            })
         );
     };
+    
 
     const handleCreateActa = async () => {
         if (!canManageActas) return;

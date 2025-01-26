@@ -60,16 +60,29 @@ const IngresosEgresos = () => {
     };
 
     const handleSearch = (e) => {
-        setSearchTerm(e.target.value.toLowerCase());
+        const value = e.target.value.toLowerCase();
+        setSearchTerm(value);
         setCurrentPage(0);
     };
 
-    const filteredData = registros.filter(
-        (registro) =>
-            registro.Categoria.toLowerCase().includes(searchTerm) ||
-            registro.Tipo.toLowerCase().includes(searchTerm) ||
-            (registro.UsuarioNombre && registro.UsuarioNombre.toLowerCase().includes(searchTerm))
-    );
+    // Filtrar registros por fecha, tipo, categoría, descripción, monto y socio
+    const filteredData = registros.filter((registro) => {
+        const fecha = registro.Fecha ? registro.Fecha.toLowerCase() : '';
+        const tipo = registro.Tipo ? registro.Tipo.toLowerCase() : '';
+        const categoria = registro.Categoria ? registro.Categoria.toLowerCase() : '';
+        const descripcion = registro.Descripcion ? registro.Descripcion.toLowerCase() : '';
+        const monto = registro.Monto ? registro.Monto.toString().toLowerCase() : '';
+        const usuario = registro.UsuarioNombre ? registro.UsuarioNombre.toLowerCase() : '';
+
+        return (
+            fecha.includes(searchTerm) ||
+            tipo.includes(searchTerm) ||
+            categoria.includes(searchTerm) ||
+            descripcion.includes(searchTerm) ||
+            monto.includes(searchTerm) ||
+            usuario.includes(searchTerm)
+        );
+    });
 
     const offset = currentPage * itemsPerPage;
     const paginatedData = filteredData.slice(offset, offset + itemsPerPage);
@@ -119,7 +132,7 @@ const IngresosEgresos = () => {
                 <input
                     type="text"
                     className="search-input"
-                    placeholder="Buscar por categoría, tipo o usuario"
+                    placeholder="Buscar por fecha, tipo, categoría, descripción, monto o socio"
                     value={searchTerm}
                     onChange={handleSearch}
                 />
