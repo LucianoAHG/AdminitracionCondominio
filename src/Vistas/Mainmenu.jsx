@@ -20,11 +20,11 @@ const MainMenu = () => {
     const userRole = localStorage.getItem('userRole') || 'Rol Usuario';
 
     const menuItems = [
-        { label: 'Inicio', icon: <FaUser />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Usuario'] },
-        { label: 'Acta', icon: <FaClipboard />, roles: ['Administrador', 'Presidente', 'Secretario', 'Usuario'] },
-        { label: 'Cuota', icon: <FaMoneyBill />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Usuario'] },
+        { label: 'Inicio', icon: <FaUser />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Socio'] },
+        { label: 'Acta', icon: <FaClipboard />, roles: ['Administrador', 'Presidente', 'Secretario', 'Socio'] },
+        { label: 'Cuota', icon: <FaMoneyBill />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Socio'] },
         { label: 'Ingresos/Egresos', icon: <FaBalanceScale />, roles: ['Administrador', 'Presidente', 'Tesorero'] },
-        { label: 'Organización (Composición Comité)', icon: <FaUsers />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Usuario'] },
+        { label: 'Organización (Composición Comité)', icon: <FaUsers />, roles: ['Administrador', 'Presidente', 'Secretario', 'Tesorero', 'Socio'] },
         { label: 'Registro Auditoría', icon: <FaFileAlt />, roles: ['Administrador', 'Presidente', ] },
         { label: 'Usuarios', icon: <FaUser />, roles: ['Administrador', 'Presidente', ] },
     ];

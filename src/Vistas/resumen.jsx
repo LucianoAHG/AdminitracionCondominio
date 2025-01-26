@@ -56,7 +56,7 @@ const Resumen = () => {
     }, []);
 
     const notificaciones = [
-        'Nueva cuota asignada a los usuarios.',
+        'Nueva cuota asignada a los socios.',
         'Próxima reunión programada para el 20 de febrero.',
         'Se han actualizado las normas del condominio.',
     ];

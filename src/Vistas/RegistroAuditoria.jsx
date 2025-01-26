@@ -43,10 +43,10 @@ const RegistroAuditoria = () => {
             if (response.data.status === 'success') {
                 setUsuarios(response.data.data || []);
             } else {
-                console.error('Error al obtener usuarios:', response.data.message);
+                console.error('Error al obtener socios:', response.data.message);
             }
         } catch (error) {
-            console.error('Error al obtener usuarios:', error.message);
+            console.error('Error al obtener socios:', error.message);
         }
     };
 
@@ -100,7 +100,7 @@ const RegistroAuditoria = () => {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Usuario</th>
+                            <th>Socio</th>
                             <th>Acción</th>
                             <th>Detalle</th>
                             <th>Fecha</th>

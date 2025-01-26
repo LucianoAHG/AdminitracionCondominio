@@ -50,10 +50,10 @@ const Actas = () => {
             if (response.data.status === 'success') {
                 setUsuarios(response.data.data || []);
             } else {
-                console.error('Error al obtener usuarios:', response.data.message);
+                console.error('Error al obtener socios:', response.data.message);
             }
         } catch (error) {
-            console.error('Error al obtener usuarios:', error.message);
+            console.error('Error al obtener socios:', error.message);
         }
     };
 
@@ -195,7 +195,7 @@ const Actas = () => {
                             value={newActa.Acuerdo}
                             onChange={(e) => setNewActa({ ...newActa, Acuerdo: e.target.value })}
                         />
-                        <label>Seleccionar Usuarios:</label>
+                        <label>Seleccionar socios:</label>
                         <select
                             multiple
                             value={newActa.IdUsuarios}

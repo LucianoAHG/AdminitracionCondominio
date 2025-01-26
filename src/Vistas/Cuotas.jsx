@@ -47,10 +47,10 @@ const Cuotas = () => {
             if (response.data.status === 'success') {
                 setUsuarios(response.data.data || []);
             } else {
-                console.error('Error al obtener usuarios:', response.data.message);
+                console.error('Error al obtener socios:', response.data.message);
             }
         } catch (error) {
-            console.error('Error al obtener usuarios:', error.message);
+            console.error('Error al obtener socios:', error.message);
         }
     };
 
@@ -58,7 +58,7 @@ const Cuotas = () => {
         const { IdUsuarios, Monto } = newCuota;
 
         if (!IdUsuarios.length || !Monto) {
-            alert('Por favor, selecciona al menos un usuario y completa el monto.');
+            alert('Por favor, selecciona al menos a un socio y completa el monto.');
             return;
         }
 
@@ -137,7 +137,7 @@ const Cuotas = () => {
             <table className="table">
                 <thead>
                     <tr>
-                        <th>Usuario</th>
+                        <th>Socio</th>
                         <th>Monto</th>
                         <th>Estado</th>
                         <th>Fecha de Pago</th>
@@ -200,7 +200,7 @@ const Cuotas = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="create-form">
-                        <label>Seleccionar Usuarios:</label>
+                        <label>Seleccionar socios:</label>
                         <select
                             multiple
                             value={newCuota.IdUsuarios}

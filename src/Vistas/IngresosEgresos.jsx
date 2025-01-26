@@ -44,10 +44,10 @@ const IngresosEgresos = () => {
             if (response.data.status === 'success') {
                 setUsuarios(response.data.data || []);
             } else {
-                console.error('Error al obtener usuarios:', response.data.message);
+                console.error('Error al obtener socios:', response.data.message);
             }
         } catch (error) {
-            console.error('Error al obtener usuarios:', error.message);
+            console.error('Error al obtener socios:', error.message);
         }
     };
 
@@ -122,7 +122,7 @@ const IngresosEgresos = () => {
                         <th>Categoría</th>
                         <th>Descripción</th>
                         <th>Monto</th>
-                        <th>Usuario</th>
+                        <th>Socio</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>

@@ -32,7 +32,7 @@ const Usuarios = () => {
             const response = await axios.get(`${baseUrlUsuarios}?action=fetch`);
             setUsuarios(response.data.data || []);
         } catch (error) {
-            console.error('Error al obtener usuarios:', error);
+            console.error('Error al obtener socios:', error);
         }
     };
 
@@ -69,15 +69,15 @@ const Usuarios = () => {
 
             const response = await axios.post(actionUrl, payload);
             if (response.data.status === 'success') {
-                alert(isEditing ? 'Usuario actualizado con éxito' : 'Usuario creado con éxito');
+                alert(isEditing ? 'Socio actualizado con éxito' : 'Socio creado con éxito');
                 fetchUsuarios();
                 resetForm();
                 setShowModal(false);
             } else {
-                alert(response.data.message || 'No se pudo guardar el usuario.');
+                alert(response.data.message || 'No se pudo guardar el socio.');
             }
         } catch (error) {
-            console.error('Error al guardar usuario:', error);
+            console.error('Error al guardar socio:', error);
             alert('Error al conectar con el servidor.');
         }
     };
@@ -96,7 +96,7 @@ const Usuarios = () => {
     };
 
     const handleDeleteUsuario = async (id) => {
-        if (window.confirm('¿Estás seguro de eliminar este usuario?')) {
+        if (window.confirm('¿Estás seguro de eliminar este socio?')) {
             try {
                 const response = await axios.delete(baseUrlUsuarios, {
                     headers: { 'Content-Type': 'application/json' },
@@ -104,13 +104,13 @@ const Usuarios = () => {
                 });
 
                 if (response.data.status === 'success') {
-                    alert('Usuario eliminado con éxito');
+                    alert('Socio eliminado con éxito');
                     fetchUsuarios();
                 } else {
-                    alert(response.data.message || 'No se pudo eliminar el usuario.');
+                    alert(response.data.message || 'No se pudo eliminar el socio.');
                 }
             } catch (error) {
-                console.error('Error al eliminar usuario:', error);
+                console.error('Error al eliminar socio:', error);
                 alert('Error al conectar con el servidor.');
             }
         }
@@ -130,7 +130,7 @@ const Usuarios = () => {
 
     return (
         <div className="usuarios-container">
-            <h2>Gestión de Usuarios</h2>
+            <h2>Gestión de Socios</h2>
 
             <Button
                 className="add-button"
@@ -139,10 +139,10 @@ const Usuarios = () => {
                     setShowModal(true);
                 }}
             >
-                Agregar Usuario
+                Agregar Socio
             </Button>
 
-            <h3>Lista de Usuarios</h3>
+            <h3>Lista de Socios</h3>
             <table className="usuarios-table">
                 <thead>
                     <tr>
@@ -175,7 +175,7 @@ const Usuarios = () => {
 
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>{isEditing ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
+                    <Modal.Title>{isEditing ? 'Editar Socio' : 'Agregar Socio'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={handleFormSubmit}>

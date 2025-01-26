@@ -12,7 +12,7 @@ if ($method === 'GET') {
     try {
         $query = "
             SELECT a.*, 
-                   (SELECT GROUP_CONCAT(u.Nombre SEPARATOR ', ') 
+                    (SELECT GROUP_CONCAT(u.Nombre SEPARATOR ', ') 
                     FROM Usuarios u 
                     WHERE FIND_IN_SET(u.Id, a.Socios)) AS NombresSocios
             FROM Actas a";
@@ -70,8 +70,8 @@ if ($method === 'GET') {
             $socios = is_array($data['Socios']) ? implode(',', array_map('intval', $data['Socios'])) : '';
 
             // Consulta para insertar los datos en la tabla Actas
-            $query = "INSERT INTO Actas (Fecha, Numero, Detalle, Acuerdo, Invitados, Socios) 
-                      VALUES (?, ?, ?, ?, ?, ?)";
+            $query="INSERT INTO Actas (Fecha, Numero, Detalle, Acuerdo, Invitados, Socios) 
+                    VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
 
             if (!$stmt) {
