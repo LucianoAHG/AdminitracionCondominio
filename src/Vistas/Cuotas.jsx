@@ -1,7 +1,8 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { FaSearch, FaEye } from 'react-icons/fa';
+import { FaSearch, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import ReactPaginate from 'react-paginate';
+import Select from 'react-select';
 import axios from 'axios';
 import '../CSS/Cuotas.css';
 
@@ -10,6 +11,7 @@ const Cuotas = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [expandedRows, setExpandedRows] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 15;
 
@@ -52,7 +54,11 @@ const Cuotas = () => {
         try {
             const response = await axios.get(`${baseUrlUsuarios}?action=fetch`);
             if (response.data.status === 'success') {
-                setUsuarios(response.data.data || []);
+                const formattedUsers = response.data.data.map((usuario) => ({
+                    value: usuario.Id,
+                    label: usuario.Nombre,
+                }));
+                setUsuarios(formattedUsers);
             } else {
                 console.error('Error al obtener socios:', response.data.message);
             }
@@ -75,7 +81,10 @@ const Cuotas = () => {
         }
 
         try {
-            const response = await axios.post(`${baseUrlCuotas}?action=create`, { ...newCuota });
+            const response = await axios.post(`${baseUrlCuotas}?action=create`, {
+                ...newCuota,
+                IdUsuarios: IdUsuarios.map((usuario) => usuario.value),
+            });
             if (response.data.status === 'success') {
                 alert('Cuotas creadas exitosamente');
                 setShowCreateModal(false);
@@ -105,13 +114,28 @@ const Cuotas = () => {
         }
     };
 
+    const toggleRow = (usuarioId) => {
+        setExpandedRows((prev) =>
+            prev.includes(usuarioId) ? prev.filter((id) => id !== usuarioId) : [...prev, usuarioId]
+        );
+    };
+
+    // Agrupar cuotas por socio
+    const groupedCuotas = cuotas.reduce((acc, cuota) => {
+        acc[cuota.UsuarioNombre] = acc[cuota.UsuarioNombre] || [];
+        acc[cuota.UsuarioNombre].push(cuota);
+        return acc;
+    }, {});
+
     // Filtrar registros por término de búsqueda
-    const filteredData = cuotas.filter((cuota) => {
+    const filteredData = Object.entries(groupedCuotas).filter(([usuarioNombre, cuotas]) => {
         return (
-            (cuota.UsuarioNombre && cuota.UsuarioNombre.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            cuota.Monto.toString().includes(searchTerm) ||
-            cuota.Estado.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            cuota.FechaPago.includes(searchTerm)
+            usuarioNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            cuotas.some((cuota) =>
+                cuota.Monto.toString().includes(searchTerm) ||
+                cuota.Estado.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                cuota.FechaPago.includes(searchTerm)
+            )
         );
     });
 
@@ -155,24 +179,57 @@ const Cuotas = () => {
                 </thead>
                 <tbody>
                     {paginatedData.length > 0 ? (
-                        paginatedData.map((cuota) => (
-                            <tr key={cuota.Id}>
-                                <td>{cuota.UsuarioNombre || 'No asignado'}</td>
-                                <td>${parseFloat(cuota.Monto || 0).toLocaleString('es-CL')}</td>
-                                <td>{cuota.Estado}</td>
-                                <td>{cuota.FechaPago || 'No registrada'}</td>
-                                <td>
-                                    {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(userRole) && (
-                                        <Button
-                                            variant="danger"
-                                            className="delete-button"
-                                            onClick={() => handleDeleteCuota(cuota.Id)}
-                                        >
-                                            Eliminar
-                                        </Button>
-                                    )}
-                                </td>
-                            </tr>
+                        paginatedData.map(([usuarioNombre, cuotas]) => (
+                            <React.Fragment key={usuarioNombre}>
+                                <tr>
+                                    <td onClick={() => toggleRow(usuarioNombre)} style={{ cursor: 'pointer' }}>
+                                        {usuarioNombre}{' '}
+                                        {expandedRows.includes(usuarioNombre) ? (
+                                            <FaChevronUp />
+                                        ) : (
+                                            <FaChevronDown />
+                                        )}
+                                    </td>
+                                    <td>${cuotas[0].Monto.toLocaleString('es-CL')}</td>
+                                    <td>{cuotas[0].Estado}</td>
+                                    <td>{cuotas[0].FechaPago || 'No registrada'}</td>
+                                    <td>
+                                        {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(
+                                            userRole
+                                        ) && (
+                                            <Button
+                                                variant="danger"
+                                                className="delete-button"
+                                                onClick={() => handleDeleteCuota(cuotas[0].Id)}
+                                            >
+                                                Eliminar
+                                            </Button>
+                                        )}
+                                    </td>
+                                </tr>
+                                {expandedRows.includes(usuarioNombre) &&
+                                    cuotas.slice(1).map((cuota) => (
+                                        <tr key={cuota.Id} className="expanded-row">
+                                            <td></td>
+                                            <td>${cuota.Monto.toLocaleString('es-CL')}</td>
+                                            <td>{cuota.Estado}</td>
+                                            <td>{cuota.FechaPago || 'No registrada'}</td>
+                                            <td>
+                                                {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(
+                                                    userRole
+                                                ) && (
+                                                    <Button
+                                                        variant="danger"
+                                                        className="delete-button"
+                                                        onClick={() => handleDeleteCuota(cuota.Id)}
+                                                    >
+                                                        Eliminar
+                                                    </Button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </React.Fragment>
                         ))
                     ) : (
                         <tr>
@@ -205,22 +262,13 @@ const Cuotas = () => {
                 <Modal.Body>
                     <div className="create-form">
                         <label>Seleccionar socios:</label>
-                        <select
-                            multiple
+                        <Select
+                            isMulti
+                            options={usuarios}
                             value={newCuota.IdUsuarios}
-                            onChange={(e) =>
-                                setNewCuota({
-                                    ...newCuota,
-                                    IdUsuarios: Array.from(e.target.selectedOptions, (option) => option.value),
-                                })
-                            }
-                        >
-                            {usuarios.map((usuario) => (
-                                <option key={usuario.Id} value={usuario.Id}>
-                                    {usuario.Nombre}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={(selected) => setNewCuota({ ...newCuota, IdUsuarios: selected })}
+                            placeholder="Seleccione socios..."
+                        />
                         <label>Monto:</label>
                         <input
                             type="number"
