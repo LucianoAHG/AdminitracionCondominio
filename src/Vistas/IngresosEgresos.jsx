@@ -2,6 +2,7 @@
 import { Modal, Button } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
 import ReactPaginate from 'react-paginate';
+import Select from 'react-select';
 import axios from 'axios';
 import '../CSS/IngresosEgresos.css';
 
@@ -19,7 +20,7 @@ const IngresosEgresos = () => {
         Descripcion: '',
         Monto: '',
         Fecha: '',
-        IdUsuario: ''
+        IdUsuarios: []
     });
 
     const baseUrl = 'https://elias.go.miorganizacion.cl/api/ingresosEgresos.php';
@@ -45,7 +46,11 @@ const IngresosEgresos = () => {
         try {
             const response = await axios.get(`${baseUrl}?action=fetchUsers`);
             if (response.data.status === 'success') {
-                setUsuarios(response.data.data || []);
+                const formattedUsers = response.data.data.map((usuario) => ({
+                    value: usuario.Id,
+                    label: usuario.Nombre,
+                }));
+                setUsuarios(formattedUsers);
             } else {
                 console.error('Error al obtener usuarios:', response.data.message);
             }
@@ -65,7 +70,7 @@ const IngresosEgresos = () => {
         setCurrentPage(0);
     };
 
-    // Filtrar registros por fecha, tipo, categoría, descripción, monto y socio
+    // Filtrar registros por búsqueda
     const filteredData = registros.filter((registro) => {
         const fecha = registro.Fecha ? registro.Fecha.toLowerCase() : '';
         const tipo = registro.Tipo ? registro.Tipo.toLowerCase() : '';
@@ -93,33 +98,20 @@ const IngresosEgresos = () => {
 
     const handleCreateRegistro = async () => {
         try {
-            const response = await axios.post(baseUrl, newRegistro);
+            const response = await axios.post(baseUrl, {
+                ...newRegistro,
+                IdUsuarios: newRegistro.IdUsuarios.map((usuario) => usuario.value), 
+            });
             if (response.data.status === 'success') {
                 alert('Registro creado con éxito');
                 setShowCreateModal(false);
-                setNewRegistro({ Tipo: 'ingreso', Categoria: '', Descripcion: '', Monto: '', Fecha: '', IdUsuario: '' });
+                setNewRegistro({ Tipo: 'ingreso', Categoria: '', Descripcion: '', Monto: '', Fecha: '', IdUsuarios: [] });
                 fetchRegistros();
             } else {
                 console.error('Error al crear el registro:', response.data.message);
             }
         } catch (error) {
             console.error('Error al crear el registro:', error.message);
-        }
-    };
-
-    const handleDeleteRegistro = async (id) => {
-        if (window.confirm('¿Estás seguro de que deseas eliminar este registro?')) {
-            try {
-                const response = await axios.delete(`${baseUrl}?id=${id}`);
-                if (response.data.status === 'success') {
-                    alert('Registro eliminado con éxito');
-                    fetchRegistros();
-                } else {
-                    console.error('Error al eliminar el registro:', response.data.message);
-                }
-            } catch (error) {
-                console.error('Error al eliminar el registro:', error.message);
-            }
         }
     };
 
@@ -150,7 +142,7 @@ const IngresosEgresos = () => {
                         <th>Categoría</th>
                         <th>Descripción</th>
                         <th>Monto</th>
-                        <th>Socio</th>
+                        <th>Socios</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -168,7 +160,7 @@ const IngresosEgresos = () => {
                                     <Button
                                         variant="danger"
                                         className="delete-button"
-                                        onClick={() => handleDeleteRegistro(registro.Id)}
+                                        onClick={() => console.log('Eliminar', registro.Id)}
                                     >
                                         Eliminar
                                     </Button>
@@ -203,17 +195,28 @@ const IngresosEgresos = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="create-form">
+                        <label>Fecha:</label>
+                        <input type="date" value={newRegistro.Fecha} onChange={(e) => setNewRegistro({ ...newRegistro, Fecha: e.target.value })} />
+
                         <label>Tipo:</label>
                         <select value={newRegistro.Tipo} onChange={(e) => setNewRegistro({ ...newRegistro, Tipo: e.target.value })}>
                             <option value="ingreso">Ingreso</option>
                             <option value="egreso">Egreso</option>
                         </select>
+
                         <label>Categoría:</label>
-                        <input
-                            type="text"
-                            placeholder="Categoría"
-                            value={newRegistro.Categoria}
-                            onChange={(e) => setNewRegistro({ ...newRegistro, Categoria: e.target.value })}
+                        <input type="text" value={newRegistro.Categoria} onChange={(e) => setNewRegistro({ ...newRegistro, Categoria: e.target.value })} />
+
+                        <label>Descripción:</label>
+                        <textarea value={newRegistro.Descripcion} onChange={(e) => setNewRegistro({ ...newRegistro, Descripcion: e.target.value })} />
+
+                        <label>Socios:</label>
+                        <Select
+                            isMulti
+                            options={usuarios}
+                            value={newRegistro.IdUsuarios}
+                            onChange={(selected) => setNewRegistro({ ...newRegistro, IdUsuarios: selected })}
+                            placeholder="Seleccione socios..."
                         />
                     </div>
                 </Modal.Body>
