@@ -1,7 +1,8 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { FaSearch, FaEye } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 import ReactPaginate from 'react-paginate';
+import Select from 'react-select';
 import axios from 'axios';
 import '../CSS/Actas.css';
 
@@ -53,7 +54,11 @@ const Actas = () => {
         try {
             const response = await axios.get(`${baseUrlUsuarios}?action=fetch`);
             if (response.data.status === 'success') {
-                setUsuarios(response.data.data || []);
+                const usuariosOptions = response.data.data.map((usuario) => ({
+                    value: usuario.Id,
+                    label: usuario.Nombre,
+                }));
+                setUsuarios(usuariosOptions);
             } else {
                 console.error('Error al obtener socios:', response.data.message);
             }
@@ -83,14 +88,13 @@ const Actas = () => {
         );
     };
 
-
     const handleCreateActa = async () => {
         if (!canManageActas) return;
 
         const actaData = {
             ...newActa,
             Invitados: newActa.Invitados.trim(),
-            Socios: newActa.IdUsuarios,
+            IdUsuarios: newActa.IdUsuarios.map((option) => option.value),
         };
 
         try {
@@ -130,7 +134,6 @@ const Actas = () => {
         }
     };
 
-    // Paginación
     const offset = currentPage * itemsPerPage;
     const paginatedData = filteredActas.slice(offset, offset + itemsPerPage);
 
@@ -146,7 +149,7 @@ const Actas = () => {
                 <input
                     type="text"
                     className="search-input"
-                    placeholder="Buscar por detalle o acuerdo"
+                    placeholder="Buscar por fecha, detalle, acuerdo o socios"
                     value={search}
                     onChange={handleSearch}
                 />
@@ -229,6 +232,30 @@ const Actas = () => {
                         <textarea
                             value={newActa.Detalle}
                             onChange={(e) => setNewActa({ ...newActa, Detalle: e.target.value })}
+                        />
+                        <label>Acuerdo:</label>
+                        <textarea
+                            value={newActa.Acuerdo}
+                            onChange={(e) => setNewActa({ ...newActa, Acuerdo: e.target.value })}
+                        />
+                        <label>Seleccionar Socios:</label>
+                        <Select
+                            isMulti
+                            options={usuarios}
+                            placeholder="Seleccionar socios..."
+                            value={newActa.IdUsuarios}
+                            onChange={(selectedOptions) =>
+                                setNewActa((prevState) => ({
+                                    ...prevState,
+                                    IdUsuarios: selectedOptions || [],
+                                }))
+                            }
+                        />
+                        <label>Invitados:</label>
+                        <textarea
+                            placeholder="Invitados manuales"
+                            value={newActa.Invitados}
+                            onChange={(e) => setNewActa({ ...newActa, Invitados: e.target.value })}
                         />
                     </div>
                 </Modal.Body>
