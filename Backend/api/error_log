@@ -16,3 +16,55 @@ Stack trace:
   thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/api.php on line 88
 [30-Dec-2024 17:44:28 UTC] PHP Warning:  require_once(../db.php): failed to open stream: No such file or directory in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php on line 3
 [30-Dec-2024 17:44:28 UTC] PHP Fatal error:  require_once(): Failed opening required '../db.php' (include_path='.:/opt/alt/php74/usr/share/pear') in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php on line 3
+[03-Jan-2025 03:53:59 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php:115
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php on line 115
+[03-Jan-2025 04:00:29 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php:134
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php on line 134
+[03-Jan-2025 04:06:22 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php:134
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php on line 134
+[03-Jan-2025 04:12:53 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php:134
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php on line 134
+[03-Jan-2025 04:13:01 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php:134
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php on line 134
+[03-Jan-2025 04:13:05 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php:134
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/usuarios.php on line 134
+[09-Jan-2025 01:44:10 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php:95
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php on line 95
+[09-Jan-2025 01:44:13 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php:95
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php on line 95
+[09-Jan-2025 01:44:14 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php:95
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php on line 95
+[09-Jan-2025 01:44:14 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php:95
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php on line 95
+[09-Jan-2025 01:44:14 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php:95
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php on line 95
+[09-Jan-2025 01:44:15 UTC] PHP Fatal error:  Uncaught Error: Call to a member function bind_param() on bool in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php:95
+Stack trace:
+#0 {main}
+  thrown in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/actas.php on line 95
+[19-Jan-2025 23:32:37 UTC] PHP Notice:  Only variables should be passed by reference in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/auditoria.php on line 19
+[19-Jan-2025 23:32:37 UTC] PHP Notice:  Only variables should be passed by reference in /home/gomiorganizacion/public_html/elias.go.miorganizacion.cl/api/auditoria.php on line 19
+[28-Jan-2025 23:24:13 UTC] Error al ejecutar la consulta de auditoría: Cannot add or update a child row: a foreign key constraint fails (`SistemaAuditoria`.`Auditoria`, CONSTRAINT `Auditoria_ibfk_1` FOREIGN KEY (`IdUsuario`) REFERENCES `Usuarios` (`Id`))
+[28-Jan-2025 23:24:38 UTC] Error al ejecutar la consulta de auditoría: Cannot add or update a child row: a foreign key constraint fails (`SistemaAuditoria`.`Auditoria`, CONSTRAINT `Auditoria_ibfk_1` FOREIGN KEY (`IdUsuario`) REFERENCES `Usuarios` (`Id`))

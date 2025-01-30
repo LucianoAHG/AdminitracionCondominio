@@ -8,7 +8,20 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
+// Función para registrar auditoría
+function registrarAuditoria($conn, $idUsuario, $accion, $detalle) {
+    $fecha = date('Y-m-d');
+    $hora = date('H:i:s');
+    
+    $query = "INSERT INTO Auditoria (IdUsuario, Accion, Detalle, Fecha, Hora) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("issss", $idUsuario, $accion, $detalle, $fecha, $hora);
+    $stmt->execute();
+}
+
 try {
+    $userId = $_GET['userId'] ?? 1; // Obtener el usuario de la solicitud o asignar por defecto
+
     // Consultar cuotas pagadas y pendientes
     $queryPagadas = "SELECT COUNT(*) AS cantidad FROM Cuotas WHERE Estado = 'Pagada'";
     $queryPendientes = "SELECT COUNT(*) AS cantidad FROM Cuotas WHERE Estado = 'Pendiente'";
@@ -43,6 +56,9 @@ try {
             'fecha' => $row['Fecha'],
         ];
     }
+
+    // Registrar la acción de consulta en la tabla de auditoría
+    registrarAuditoria($conn, $userId, 'Consulta de resumen', 'Se consultó el resumen de cuotas y actas');
 
     echo json_encode([
         'status' => 'success',

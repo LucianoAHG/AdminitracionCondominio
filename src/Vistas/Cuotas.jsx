@@ -11,6 +11,7 @@ const Cuotas = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [expandedRows, setExpandedRows] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 15;
@@ -19,6 +20,14 @@ const Cuotas = () => {
         IdUsuarios: [],
         Monto: '',
         Estado: 'Pendiente',
+        FechaPago: '',
+    });
+
+    const [editCuota, setEditCuota] = useState({
+        Id: '',
+        IdUsuarios: [],
+        Monto: '',
+        Estado: '',
         FechaPago: '',
     });
 
@@ -98,6 +107,24 @@ const Cuotas = () => {
         }
     };
 
+    const handleEditCuota = async () => {
+        try {
+            const response = await axios.put(`${baseUrlCuotas}?action=update`, {
+                ...editCuota,
+                IdUsuarios: editCuota.IdUsuarios.map((usuario) => usuario.value),
+            });
+            if (response.data.status === 'success') {
+                alert('Cuota actualizada exitosamente');
+                setShowEditModal(false);
+                fetchCuotas();
+            } else {
+                console.error('Error al actualizar cuota:', response.data.message);
+            }
+        } catch (error) {
+            console.error('Error al actualizar cuota:', error.message);
+        }
+    };
+
     const handleDeleteCuota = async (id) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar esta cuota?')) {
             try {
@@ -114,20 +141,29 @@ const Cuotas = () => {
         }
     };
 
+    const handleEditButtonClick = (cuota) => {
+        setEditCuota({
+            Id: cuota.Id,
+            IdUsuarios: usuarios.filter((usuario) => usuario.value === cuota.IdUsuario),
+            Monto: cuota.Monto,
+            Estado: cuota.Estado,
+            FechaPago: cuota.FechaPago,
+        });
+        setShowEditModal(true);
+    };
+
     const toggleRow = (usuarioId) => {
         setExpandedRows((prev) =>
             prev.includes(usuarioId) ? prev.filter((id) => id !== usuarioId) : [...prev, usuarioId]
         );
     };
 
-    // Agrupar cuotas por socio
     const groupedCuotas = cuotas.reduce((acc, cuota) => {
         acc[cuota.UsuarioNombre] = acc[cuota.UsuarioNombre] || [];
         acc[cuota.UsuarioNombre].push(cuota);
         return acc;
     }, {});
 
-    // Filtrar registros por término de búsqueda
     const filteredData = Object.entries(groupedCuotas).filter(([usuarioNombre, cuotas]) => {
         return (
             usuarioNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -139,7 +175,6 @@ const Cuotas = () => {
         );
     });
 
-    // Paginación de datos
     const offset = currentPage * itemsPerPage;
     const paginatedData = filteredData.slice(offset, offset + itemsPerPage);
 
@@ -194,16 +229,23 @@ const Cuotas = () => {
                                     <td>{cuotas[0].Estado}</td>
                                     <td>{cuotas[0].FechaPago || 'No registrada'}</td>
                                     <td>
-                                        {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(
-                                            userRole
-                                        ) && (
-                                            <Button
-                                                variant="danger"
-                                                className="delete-button"
-                                                onClick={() => handleDeleteCuota(cuotas[0].Id)}
-                                            >
-                                                Eliminar
-                                            </Button>
+                                        {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(userRole) && (
+                                            <>
+                                                <Button
+                                                    variant="warning"
+                                                    className="edit-button"
+                                                    onClick={() => handleEditButtonClick(cuotas[0])}
+                                                >
+                                                    Editar
+                                                </Button>{' '}
+                                                <Button
+                                                    variant="danger"
+                                                    className="delete-button"
+                                                    onClick={() => handleDeleteCuota(cuotas[0].Id)}
+                                                >
+                                                    Eliminar
+                                                </Button>
+                                            </>
                                         )}
                                     </td>
                                 </tr>
@@ -218,13 +260,22 @@ const Cuotas = () => {
                                                 {['Administrador', 'Presidente', 'Secretario', 'Tesorero'].includes(
                                                     userRole
                                                 ) && (
-                                                    <Button
-                                                        variant="danger"
-                                                        className="delete-button"
-                                                        onClick={() => handleDeleteCuota(cuota.Id)}
-                                                    >
-                                                        Eliminar
-                                                    </Button>
+                                                    <>
+                                                        <Button
+                                                            variant="warning"
+                                                            className="edit-button"
+                                                            onClick={() => handleEditButtonClick(cuota)}
+                                                        >
+                                                            Editar
+                                                        </Button>{' '}
+                                                        <Button
+                                                            variant="danger"
+                                                            className="delete-button"
+                                                            onClick={() => handleDeleteCuota(cuota.Id)}
+                                                        >
+                                                            Eliminar
+                                                        </Button>
+                                                    </>
                                                 )}
                                             </td>
                                         </tr>
@@ -283,6 +334,52 @@ const Cuotas = () => {
                         Crear
                     </Button>
                     <Button variant="danger" onClick={() => setShowCreateModal(false)}>
+                        Cancelar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Editar Cuota</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="edit-form">
+                        <label>Seleccionar socios:</label>
+                        <Select
+                            isMulti
+                            options={usuarios}
+                            value={editCuota.IdUsuarios}
+                            onChange={(selected) => setEditCuota({ ...editCuota, IdUsuarios: selected })}
+                            placeholder="Seleccione socios..."
+                        />
+                        <label>Monto:</label>
+                        <input
+                            type="number"
+                            placeholder="Monto"
+                            value={editCuota.Monto}
+                            onChange={(e) => setEditCuota({ ...editCuota, Monto: e.target.value })}
+                        />
+                        <label>Estado:</label>
+                        <input
+                            type="text"
+                            placeholder="Estado"
+                            value={editCuota.Estado}
+                            onChange={(e) => setEditCuota({ ...editCuota, Estado: e.target.value })}
+                        />
+                        <label>Fecha de Pago:</label>
+                        <input
+                            type="date"
+                            value={editCuota.FechaPago}
+                            onChange={(e) => setEditCuota({ ...editCuota, FechaPago: e.target.value })}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="success" onClick={handleEditCuota}>
+                        Guardar Cambios
+                    </Button>
+                    <Button variant="danger" onClick={() => setShowEditModal(false)}>
                         Cancelar
                     </Button>
                 </Modal.Footer>

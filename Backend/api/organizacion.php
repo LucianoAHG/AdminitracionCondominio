@@ -34,12 +34,12 @@ switch ($method) {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ii", $data['IdUsuario'], $data['IdRol']);
         $stmt->execute();
-        echo json_encode(['status' => 'success', 'message' => 'OrganizaciÃ³n creada']);
+        echo json_encode(['status' => 'success', 'message' => 'Organizaci¨®n creada']);
         break;
 
     default:
         http_response_code(405);
-        echo json_encode(['status' => 'error', 'message' => 'MÃ©todo no permitido']);
+        echo json_encode(['status' => 'error', 'message' => 'M¨¦todo no permitido']);
         break;
 }
 $conn->close();
